@@ -1,6 +1,7 @@
 from flask import Flask
 import pkgutil
 import blueprints
+import os
 
 
 def register_blueprints(app: Flask) -> None:
@@ -23,7 +24,10 @@ def create_app() -> Flask:
 
 def main() -> None:
     app = create_app()
-    app.run()
+    app.run(
+        host=os.getenv("FLASK_RUN_HOST", "0.0.0.0"),
+        port=int(os.getenv("FLASK_RUN_PORT", 5000)),
+    )
 
 
 if __name__ == "__main__":
