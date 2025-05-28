@@ -1,0 +1,9 @@
+@font-face {
+    font-family: "ComicMono";
+    src: url("ComicMono.ttf");
+}
+  
+body{
+    font-family: "ComicMono";
+}
+  
