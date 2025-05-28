@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS Posts (
     description TEXT NOT NULL,
     file_name TEXT NOT NULL,
     start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP NOT NULL.
-    owner TEXT REFERENCES Groups(name),
+    end_time TIMESTAMP NOT NULL,
+    owner TEXT REFERENCES Groups(name)
 );
 
 CREATE TABLE IF NOT EXISTS PostViews (
