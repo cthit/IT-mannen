@@ -1,4 +1,5 @@
-import psycopg2
+from psycopg2 import connect
+from psycopg2.extensions import connection
 import dotenv
 import os
 
@@ -12,7 +13,7 @@ PR_DB_HOST = os.getenv("PR_DB_HOST")
 PR_DB_PORT = os.getenv("PR_DB_PORT")
 
 
-def read_sql_file(file_path):
+def read_sql_file(file_path: str):
     """
     Read the SQL file and return its content.
     """
@@ -21,7 +22,7 @@ def read_sql_file(file_path):
     return sql_content
 
 
-def execute_sql(conn, sql):
+def execute_sql(conn: connection, sql: str):
     """
     Execute the SQL command.
     """
@@ -32,9 +33,9 @@ def execute_sql(conn, sql):
 
 def create_pr_tables():
     """
-    Create the login tables in the database.
+    Create the pr tables in the database.
     """
-    with psycopg2.connect(
+    with connect(
         dbname=PR_DB_NAME,
         user=PR_DB_USER,
         password=PR_DB_PASSWORD,
