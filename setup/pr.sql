@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS PostViews (
     owner TEXT REFERENCES Groups(name)
 );
 
-CREATE TABLE IF NOT EXISTS ViewContents (
+CREATE TABLE IF NOT EXISTS PostViewContents (
     view_route TEXT REFERENCES PostViews(route) ON DELETE CASCADE,
     post_id INT REFERENCES Posts(id) ON DELETE CASCADE  
 );
