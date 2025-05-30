@@ -6,56 +6,101 @@ from connection_pr import pr_cursor
 
 
 @pr_cursor
-def create_group(cur: cursor, name: str) -> None:
-    cur.execute("INSERT INTO Groups (name) VALUES (%s);", (name,))
+def create_group(cur: cursor, group_name: str) -> None:
+    cur.execute("INSERT INTO Groups (name) VALUES (%s);", (group_name,))
 
 
 @pr_cursor
-def create_post(
-    cur: cursor, description: str, file_name: str, start_time: str, end_time: str
-):
+def create_post(cur: cursor, description: str, file_name: str):
+
+    cur.execute(
+        "INSERT INTO Posts (description, file_name, owner) VALUES (%s, %s, %s);",
+        (description, file_name, "admin"),
+    )
+
+
+@pr_cursor
+def delete_post(cur: cursor, post_id: int):
+    cur.execute("DELETE FROM Posts WHERE id=%s;", (post_id,))
+
+
+@pr_cursor
+def change_post(cur: cursor, post_id: int, new_description: str):
+
+    cur.execute(
+        "UPDATE Posts SET description=%s WHERE id=%s;", (new_description, post_id)
+    )
+
+
+@pr_cursor
+def set_timed_post(cur: cursor, post_id: int, start_time: str, end_time: str):
     start_time_parsed: datetime = parse(start_time)
     end_time_parsed: datetime = parse(end_time)
 
     cur.execute(
-        "INSERT INTO Posts (description, file_name, start_time, end_time, owner) VALUES (%s, %s, %s, %s, %s);",
-        (description, file_name, start_time_parsed, end_time_parsed, "admin"),
+        "INSERT INTO TimedPosts VALUES (%s, %s, %s);",
+        (post_id, start_time_parsed, end_time_parsed),
     )
 
 
 @pr_cursor
-def delete_post(cur: cursor, id: int):
-    cur.execute("DELETE FROM Posts WHERE id=%s;", (id,))
+def remove_timed_post(cur: cursor, post_id: int):
+    cur.execute("DELETE FROM TimedPosts WHERE id=%s;", (post_id,))
 
 
 @pr_cursor
-def change_post_description(cur: cursor, id: int, new_description: str):
-    cur.execute("UPDATE Posts SET description=%s WHERE id=%s;", (new_description, id))
+def get_timed_post(cur: cursor, post_id: int) -> tuple[datetime, datetime]:
+    cur.execute("SELECT start_time, end_time FROM TimedPosts WHERE id=%s;", (post_id,))
+    row: tuple[datetime, datetime] | None = cur.fetchone()
 
-
-@pr_cursor
-def change_post_times(cur: cursor, id: int, new_start_time: str, new_end_time: str):
-    new_start_time_parsed: datetime = parse(new_start_time)
-    new_end_time_parsed: datetime = parse(new_end_time)
-
-    cur.execute(
-        "UPDATE Posts SET start_time=%s, end_time=%s WHERE id=%s;",
-        (new_start_time_parsed, new_end_time_parsed, id),
-    )
-
-
-@pr_cursor
-def get_post(cur: cursor, id: int) -> tuple[str, str, datetime, datetime, str]:
-    cur.execute(
-        "SELECT description, file_name, start_time, end_time, owner FROM Posts WHERE id=%s;",
-        (id,),
-    )
-    row = cur.fetchone()
     if row is None:
-        raise ValueError(f"No post found with id {id}")
+        raise ValueError(f"Post {post_id} is not a timed post")
 
-    post: tuple[str, str, datetime, datetime, str] = row
+    post: tuple[datetime, datetime] = row
     return post
+
+
+@pr_cursor
+def change_timed_post(
+    cur: cursor,
+    post_id: int,
+    new_start_time: str | None = None,
+    new_end_time: str | None = None,
+):
+    fields: list[str] = []
+    values: list[datetime | int] = []
+
+    if new_start_time is not None:
+        fields.append("start_time=%s")
+        new_start_time_parsed: datetime = parse(new_start_time)
+        values.append(new_start_time_parsed)
+
+    if new_end_time is not None:
+        fields.append("end_time=%s")
+        new_end_time_parsed: datetime = parse(new_end_time)
+        values.append(new_end_time_parsed)
+
+    if not fields:
+        return
+
+    values.append(post_id)
+    cur.execute(f"UPDATE TimedPosts SET {', '.join(fields)} WHERE id=%s;", values)
+
+
+@pr_cursor
+def get_groups_posts(
+    cur: cursor, owner_group: str
+) -> tuple[tuple[int, str, str, bool], ...]:
+    cur.execute(
+        """SELECT p.id, p.description, p.file_name, tp.id IS NOT NULL AS is_timed 
+        FROM Posts p 
+        LEFT JOIN TimedPosts tp ON p.id=tp.id 
+        WHERE owner=%s;""",
+        (owner_group,),
+    )
+
+    posts: tuple[tuple[int, str, str, bool], ...] = tuple(cur.fetchall())
+    return posts
 
 
 @pr_cursor
@@ -67,25 +112,39 @@ def create_postview(cur: cursor, route: str, name: str):
 
 
 @pr_cursor
-def delete_postview(cur: cursor, id: int):
-    cur.execute("DELETE FROM PostViews WHERE id=%s;", (id,))
+def delete_postview(cur: cursor, postview_id: int):
+    cur.execute("DELETE FROM PostViews WHERE id=%s;", (postview_id,))
 
 
 @pr_cursor
-def change_postview_name(cur: cursor, id: int, new_name: str):
-    cur.execute("UPDATE PostViews SET name=%s WHERE id=%s;", (new_name, id))
+def change_postview(
+    cur: cursor, postview_id: int, route: str | None = None, name: str | None = None
+):
+    fields: list[str] = []
+    values: list[int | str] = []
+
+    if route is not None:
+        fields.append("route=%s")
+        values.append(route)
+
+    if name is not None:
+        fields.append("name=%s")
+        values.append(name)
+
+    if not fields:
+        return
+
+    values.append(postview_id)
+    cur.execute(f"UPDATE PostViews SET {', '.join(fields)} WHERE id=%s;", values)
 
 
 @pr_cursor
-def change_postview_route(cur: cursor, id: int, new_route: str):
-    cur.execute("UPDATE PostViews SET route=%s WHERE id=%s;", (new_route, id))
+def get_groups_postviews(
+    cur: cursor, owner_group: str
+) -> tuple[tuple[int, str, str], ...]:
+    cur.execute("SELECT id, route, name FROM PostViews WHERE owner=%s;", (owner_group,))
 
-
-@pr_cursor
-def get_groups_postviews(cur: cursor, group: str) -> list[tuple[int, str, str]]:
-    cur.execute("SELECT id, route, name FROM PostViews WHERE owner=%s;", (group,))
-
-    postviews: list[tuple[int, str, str]] = cur.fetchall()
+    postviews: tuple[tuple[int, str, str], ...] = tuple(cur.fetchall())
     return postviews
 
 
@@ -106,9 +165,16 @@ def remove_post_from_postview(cur: cursor, view_id: int, post_id: int):
 
 
 @pr_cursor
-def get_content_from_postview(cur: cursor, view_id: int) -> list[int]:
-    cur.execute("SELECT post_id FROM PostViewContents WHERE view_id=%s;", (view_id,))
-    rows: list[tuple[int]] = cur.fetchall()
-    posts: list[int] = [row[0] for row in rows]
+def get_content_from_postview(
+    cur: cursor, view_id: int
+) -> tuple[tuple[int, str, str, bool], ...]:
+    cur.execute(
+        """SELECT p.id, p.description, p.file_name, tp.id IS NOT NULL AS is_timed 
+        FROM Posts p JOIN PostViewContents pvc ON p.id=pvc.post_id
+        LEFT JOIN TimedPosts tp ON p.id=tp.id 
+        WHERE pvc.view_id=%s;""",
+        (view_id,),
+    )
+    posts: tuple[tuple[int, str, str, bool], ...] = tuple(cur.fetchall())
 
     return posts
