@@ -2,11 +2,13 @@ from flask import Flask
 import pkgutil
 import blueprints
 import os
+from typing import Sequence
 
 
 def register_blueprints(app: Flask) -> None:
 
-    modules = pkgutil.iter_modules(blueprints.__path__)
+    path: Sequence[str] = getattr(blueprints, "__path__")
+    modules = pkgutil.iter_modules(path)
 
     for _, module_name, __ in modules:
         module = __import__(f"blueprints.{module_name}", fromlist=[""])
