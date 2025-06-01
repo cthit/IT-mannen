@@ -1,5 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT-mannen</title>
+    {% block head %}
+    {% endblock %}
+</head>
 <body>
-    <h1>
-        IT-mannen
-    </h1>
+    <header>
+        <h1>
+            IT-mannen
+        </h1>
+        {% block header %}
+        {% endblock %}
+    </header>
+
+    <main>
+        {% block main %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        {% block footer %}
+        {% endblock %}
+        <p>
+            Skapad av Fogel🦅, inspirerad av DHacks TV-mannen
+        </p>
+    </footer>
 </body>
+</html>

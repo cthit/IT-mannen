@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+
+{% block main %}
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>{{ form.description.label }} {{ form.description() }}</p>
+    <p>{{ form.file.label }} {{ form.file(type="file", accept="image/*") }}</p>
+    <p>{{ form.is_timed.label }} {{ form.is_timed() }}</p>
+    <p>{{ form.start_time.label }} {{ form.start_time() }}</p>
+    <p>{{ form.end_time.label }} {{ form.end_time() }}</p>
+    <p>{{ form.submit.label }} {{ form.submit() }}</p>
+</form>
+
+{% endblock %}

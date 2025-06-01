@@ -26,6 +26,7 @@ def create_app() -> Flask:
 
 def main() -> None:
     app = create_app()
+    app.secret_key = os.getenv("APP_SECRET")
     app.run(
         host=os.getenv("FLASK_RUN_HOST", "0.0.0.0"),
         port=int(os.getenv("FLASK_RUN_PORT", 5000)),
