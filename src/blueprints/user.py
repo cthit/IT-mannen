@@ -1,7 +1,7 @@
 
 from flask import Blueprint, render_template, flash
 from forms import create_post_form
-from database.pr import create_post, set_timed_post
+from database.pr import create_post, create_timed_post
 
 _user = Blueprint("user", __name__, template_folder="templates")
 
@@ -15,20 +15,27 @@ def user_page() -> str:
         if file_data:
             filename = file_data.filename
             file_data.save(f"static/uploads/{filename}")
+            flash("File uploaded successfully", "success")
         else:
             flash("No file uploaded", "info")
 
         # Use psycopg2-based function to create post
-        create_post(
-            description=form.description.data,
-            file_name=filename
-        )
-        flash("post created successfully", "success")
         if form.is_timed.data:
-            set_timed_post(form.description.data)
+            create_timed_post(
+                description=form.description.data,
+                file_name=filename,
+                start_time=form.start_time.data,
+                end_time=form.end_time.data,
+                )
             flash("post set as timed", "info")
         else:
+            create_post(
+            description=form.description.data,
+            file_name=filename
+            )
             flash("post is not timed", "info")
+        
+        flash("post created successfully", "success")
         return render_template("user.html", form=form)
     else:
         flash("post creation failed, form.validate_on_submit() is false", "error")
