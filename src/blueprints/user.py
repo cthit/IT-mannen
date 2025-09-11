@@ -1,8 +1,7 @@
 
 from flask import Blueprint, render_template, flash
 from forms import create_post_form
-from src.database.pr import create_post, set_timed_post
-from src.database.connection_pr import pr_cursor
+from database.pr import create_post, set_timed_post
 
 _user = Blueprint("user", __name__, template_folder="templates")
 
@@ -24,22 +23,12 @@ def user_page() -> str:
             description=form.description.data,
             file_name=filename
         )
-
-        # If the post is timed, set the timed post
-        if form.is_timed.data:
-            @pr_cursor
-            def get_latest_post_id(cur):
-                cur.execute("SELECT id FROM Posts WHERE owner=%s ORDER BY id DESC LIMIT 1;", ("admin",))
-                row = cur.fetchone()
-                return row[0] if row else None
-            post_id = get_latest_post_id()
-            if post_id:
-                set_timed_post(
-                    post_id=post_id,
-                    start_time=str(form.start_time.data),
-                    end_time=str(form.end_time.data)
-                )
         flash("post created successfully", "success")
+        if form.is_timed.data:
+            set_timed_post(form.description.data)
+            flash("post set as timed", "info")
+        else:
+            flash("post is not timed", "info")
         return render_template("user.html", form=form)
     else:
         flash("post creation failed, form.validate_on_submit() is false", "error")
