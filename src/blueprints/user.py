@@ -1,5 +1,5 @@
 
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, render_template, flash, request
 from forms import create_post_form
 from database.pr import create_post, create_timed_post
 
@@ -8,6 +8,9 @@ _user = Blueprint("user", __name__, template_folder="templates")
 
 @_user.route("/user", methods=["GET", "POST"])
 def user_page() -> str:
+    if request.method == "GET":
+        form = create_post_form()
+        return render_template("user.html", form=form)
     form = create_post_form()
     if form.validate_on_submit():
         file_data = form.file.data
@@ -36,10 +39,10 @@ def user_page() -> str:
             flash("post is not timed", "info")
         
         flash("post created successfully", "success")
-        return render_template("user.html", form=form)
+        return redirect("/")
     else:
         flash("post creation failed, form.validate_on_submit() is false", "error")
-    return render_template("user.html", form=form)
+    return redirect("/")
 
 
 def create_blueprint() -> Blueprint:
