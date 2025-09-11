@@ -42,8 +42,11 @@ services:
       - ${FLASK_RUN_PORT:-5000}:5000
     volumes:
       - .:/app
+      - images:/app/static/images
     working_dir: /app
     command: python src/app.py
+    
 
 volumes:
+  images:
   pgdata:
