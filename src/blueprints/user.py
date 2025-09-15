@@ -1,5 +1,5 @@
 
-from flask import Blueprint, render_template, flash, request
+from flask import Blueprint, render_template, flash, request, redirect
 from forms import create_post_form
 from database.pr import create_post, create_timed_post
 
@@ -17,7 +17,7 @@ def user_page() -> str:
         filename = None
         if file_data:
             filename = file_data.filename
-            file_data.save(f"static/uploads/{filename}")
+            file_data.save(f"images/{filename}")
             flash("File uploaded successfully", "success")
         else:
             flash("No file uploaded", "info")

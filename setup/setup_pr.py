@@ -55,3 +55,4 @@ if __name__ == "__main__":
     print(f"Password: {PR_DB_PASSWORD}")
     create_pr_tables()
     print("Pr tables created successfully.")
+ 
