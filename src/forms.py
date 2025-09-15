@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm  # type: ignore
 from flask_wtf.file import FileField, FileRequired, FileAllowed  # type: ignore
 from wtforms import StringField, BooleanField, SubmitField
+from wtforms.fields import DateTimeLocalField
 from wtforms.validators import InputRequired
 
 
@@ -18,16 +19,16 @@ class create_post_form(FlaskForm):
         "file", validators=[FileRequired(), FileAllowed(["png", "jpg"], "Images only!")]
     )
     is_timed = BooleanField("Timed post?")
-    start_time = StringField("Start time")
-    end_time = StringField("End time")
+    start_time = DateTimeLocalField("Start time", format='%Y-%m-%dT%H:%M')
+    end_time = DateTimeLocalField("End time", format='%Y-%m-%dT%H:%M')
     submit = SubmitField("Create post")
 
 
 class modify_post_form(FlaskForm):
     description = StringField("description", validators=[InputRequired()])
     is_timed = BooleanField("Timed post?")
-    start_time = StringField("Start time")
-    end_time = StringField("End time")
+    start_time = DateTimeLocalField("Start time", format='%Y-%m-%dT%H:%M')
+    end_time = DateTimeLocalField("End time", format='%Y-%m-%dT%H:%M')
     submit = SubmitField("Save changes")
 
 
