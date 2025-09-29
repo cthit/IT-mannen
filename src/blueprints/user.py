@@ -14,7 +14,8 @@ def user_page() -> str:
     
     form = create_post_form()
     if not form.validate_on_submit():
-        return redirect("/error")
+        flash("Please fill out all required fields.", "error")
+        return render_template("user.html", form=form)
     file_data = form.file.data
     # Save uploaded file to a new file in the volume if present
     
@@ -33,6 +34,7 @@ def user_page() -> str:
             start_time=form.start_time.data,
             end_time=form.end_time.data,
         )
+
     else:
         create_post(
             description=form.description.data,
