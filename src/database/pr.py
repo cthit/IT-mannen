@@ -2,8 +2,8 @@ from psycopg2.extensions import cursor
 from dateutil.parser import parse
 from datetime import datetime
 
-from connection_pr import pr_cursor
-from pr_tuples import *
+from database.connection_pr import pr_cursor
+from database.pr_tuples import *
 
 
 @pr_cursor
@@ -19,6 +19,24 @@ def create_post(cur: cursor, description: str, file_name: str):
         (description, file_name, "admin"),
     )
 
+## this creates aboth a post and a timed post entry, with the same id
+@pr_cursor
+def create_timed_post(cur: cursor, description: str, file_name: str, start_time: str, end_time: str) -> int:
+    start_time_parsed: datetime = start_time
+    end_time_parsed: datetime = end_time
+
+    cur.execute(
+        "INSERT INTO Posts (description, file_name, owner) VALUES (%s, %s, %s) RETURNING id;",
+        (description, file_name, "admin"),
+    )
+    post_id: int = cur.fetchone()[0]
+
+    cur.execute(
+        "INSERT INTO TimedPosts VALUES (%s, %s, %s);",
+        (post_id, start_time_parsed, end_time_parsed),
+    )
+
+    return post_id
 
 @pr_cursor
 def delete_post(cur: cursor, post_id: int):
@@ -32,7 +50,7 @@ def change_post(cur: cursor, post_id: int, new_description: str):
         "UPDATE Posts SET description=%s WHERE id=%s;", (new_description, post_id)
     )
 
-
+## this only creates a timed post entry, the post must already exist
 @pr_cursor
 def set_timed_post(cur: cursor, post_id: int, start_time: str, end_time: str):
     start_time_parsed: datetime = parse(start_time)
