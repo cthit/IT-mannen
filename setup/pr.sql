@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS TimedPosts (
 
 CREATE TABLE IF NOT EXISTS PostViews (
     id SERIAL PRIMARY KEY,
-    route TEXT NOT NULL UNIQUE CHECK (route ~ '^[a-z0-9_-]+$'), -- only lowercase letters, numbers, underscores, and dashes
     name TEXT NOT NULL,
     owner TEXT NOT NULL REFERENCES Groups(name) ON DELETE CASCADE
 );

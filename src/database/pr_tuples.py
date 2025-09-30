@@ -17,5 +17,4 @@ class TimedPost(NamedTuple):
 
 class PostView(NamedTuple):
     id: int
-    route: str
     name: str

@@ -1,0 +1,16 @@
+{% extends "index.html" %}
+
+{% block main %}
+
+<div>
+    {{ view_id }}
+    {% for route in routes %}
+    <div>
+        <a href="/?id={{ route.id }}">
+            hej
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
