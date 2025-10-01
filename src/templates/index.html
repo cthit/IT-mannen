@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <script src="https://cdn.tailwindcss.com"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href={{ url_for('static', filename='styles.css' ) }}>
@@ -12,10 +13,10 @@
 
 <body>
     <header>
+        {% block header %}
         <h1>
             IT-mannen
         </h1>
-        {% block header %}
         {% endblock %}
     </header>
 
@@ -28,7 +29,7 @@
         {% block footer %}
         {% endblock %}
         <p>
-            Skapad av Fogel🦅, inspirerad av DHacks TV-mannen
+            Skapad av Fogel🦅 och 🧙‍♂️Merlin🪄, inspirerad av DHacks TV-mannen
         </p>
     </footer>
 </body>
