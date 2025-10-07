@@ -13,7 +13,7 @@ def user_page() -> str:
         return render_template("user.html", form=form)
     
     form = create_post_form()
-    if not form.validate_on_submit():
+    if form.is_timed.data and not form.validate_on_submit():
         flash("Please fill out all required fields.", "error")
         return render_template("user.html", form=form)
     file_data = form.file.data
