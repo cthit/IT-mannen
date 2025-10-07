@@ -21,9 +21,7 @@ def create_post(cur: cursor, description: str, file_name: str):
 
 ## this creates aboth a post and a timed post entry, with the same id
 @pr_cursor
-def create_timed_post(cur: cursor, description: str, file_name: str, start_time: str, end_time: str) -> int:
-    start_time_parsed: datetime = start_time
-    end_time_parsed: datetime = end_time
+def create_timed_post(cur: cursor, description: str, file_name: str, start_time: datetime, end_time: datetime) -> int:
 
     cur.execute(
         "INSERT INTO Posts (description, file_name, owner) VALUES (%s, %s, %s) RETURNING id;",
@@ -33,7 +31,7 @@ def create_timed_post(cur: cursor, description: str, file_name: str, start_time:
 
     cur.execute(
         "INSERT INTO TimedPosts VALUES (%s, %s, %s);",
-        (post_id, start_time_parsed, end_time_parsed),
+        (post_id, start_time, end_time),
     )
 
     return post_id
@@ -126,10 +124,10 @@ def get_groups_posts(cur: cursor, owner_group: str) -> tuple[Post, ...]:
 
 
 @pr_cursor
-def create_postview(cur: cursor, route: str, name: str):
+def create_postview(cur: cursor, name: str):
     cur.execute(
-        "INSERT INTO PostViews (route, name, owner) VALUES (%s, %s, %s);",
-        (route, name, "admin"),
+        "INSERT INTO PostViews (name, owner) VALUES (%s, %s, %s);",
+        (name, "admin"),
     )
 
 
@@ -140,14 +138,10 @@ def delete_postview(cur: cursor, postview_id: int):
 
 @pr_cursor
 def change_postview(
-    cur: cursor, postview_id: int, route: str | None = None, name: str | None = None
+    cur: cursor, postview_id: int, name: str | None = None
 ):
     fields: list[str] = []
     values: list[int | str] = []
-
-    if route is not None:
-        fields.append("route=%s")
-        values.append(route)
 
     if name is not None:
         fields.append("name=%s")
@@ -161,12 +155,23 @@ def change_postview(
 
 
 @pr_cursor
-def get_groups_postviews(cur: cursor, owner_group: str) -> tuple[PostView, ...]:
-    cur.execute("SELECT id, route, name FROM PostViews WHERE owner=%s;", (owner_group,))
-    rows: list[tuple[int, str, str]] = cur.fetchall()
+def get_postviews(cur:cursor) -> tuple[PostView, ...]:
+    cur.execute("SELECT id, name FROM PostViews")
+    rows: list[tuple[int, str]] = cur.fetchall()
 
     postviews: tuple[PostView, ...] = tuple(
-        PostView(row[0], row[1], row[2]) for row in rows
+        PostView(row[0], row[1]) for row in rows
+    )
+    return postviews
+
+
+@pr_cursor
+def get_groups_postviews(cur: cursor, owner_group: str) -> tuple[PostView, ...]:
+    cur.execute("SELECT id name FROM PostViews WHERE owner=%s;", (owner_group,))
+    rows: list[tuple[int, str]] = cur.fetchall()
+
+    postviews: tuple[PostView, ...] = tuple(
+        PostView(row[0], row[1]) for row in rows
     )
     return postviews
 

@@ -175,3 +175,5 @@ cython_debug/
 
 # Ignore uploaded images
 images/
+
+.vscode
