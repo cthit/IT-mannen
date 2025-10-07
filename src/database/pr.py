@@ -126,7 +126,7 @@ def get_groups_posts(cur: cursor, owner_group: str) -> tuple[Post, ...]:
 @pr_cursor
 def create_slideshow(cur: cursor, name: str) -> int:
     cur.execute(
-        "INSERT INTO Slideshows (name, owner) VALUES ( %s, %s);",
+        "INSERT INTO Slideshows (name, owner) VALUES ( %s, %s) RETURNING id;",
         (name, "admin"),
     )
     new_id: int = cur.fetchone()[0]
