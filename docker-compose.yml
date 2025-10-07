@@ -24,7 +24,7 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    command: ["./setup/wait-for-it.sh", "pr_db", "5432", "--", "python", "setup/setup_pr.py"]
+    command: ["bash", "/app/setup/wait-for-it.sh", "pr_db", "5432", "--", "python", "setup/setup_pr.py"]
   app:
     build: .
     depends_on:
