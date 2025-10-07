@@ -1,25 +1,18 @@
-import time
-from flask import Flask, Response, Blueprint
+from flask import Response, Blueprint, request
+
+from slidegenerator import generate
 
 _view = Blueprint("view", __name__, template_folder="templates")
 
 
-@app.route("/slideshow_stream")
+@_view.route("/tv")
 def slideshow_stream():
-    def generate():
-        slides = ["static/slide1.png", "static/slide2.png", "static/slide3.png"]
-        while True:
-            for slide in slides:
-                with open(slide, "rb") as f:
-                    img_data = f.read()
-                yield (
-                    b"--frame\r\n"
-                    b"Content-Type: image/png\r\n\r\n" + img_data + b"\r\n"
-                )
-                time.sleep(5)
+    view_id = int(request.args.get("view_id", "0")) # TODO handle view_id is None
+    interval = float(request.args.get("interval", "5"))
 
-    return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
+    return Response(generate(view_id=view_id, interval=interval), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
-
+def create_blueprint() -> Blueprint:
+    return _view
 

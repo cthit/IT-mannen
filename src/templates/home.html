@@ -3,10 +3,9 @@
 {% block main %}
 
 <div>
-    {{ view_id }}
     {% for route in routes %}
     <div>
-        <a href="/?id={{ route.id }}">
+        <a href="/?view_id={{ route.id }}">
             hej
         </a>
     </div>
