@@ -32,13 +32,13 @@ class modify_post_form(FlaskForm):
     submit = SubmitField("Save changes")
 
 
-class create_postview_form(FlaskForm):
-    route = StringField("Route", validators=[InputRequired()])
+class create_slideshow_form(FlaskForm):
+    #route = StringField("Route", validators=[InputRequired()])
     name = StringField("Name", validators=[InputRequired()])
     submit = SubmitField("Create view")
 
 
-class modify_postview_form(FlaskForm):
-    route = StringField("Route", validators=[InputRequired()])
+class modify_slideshow_form(FlaskForm):
+    #route = StringField("Route", validators=[InputRequired()])
     name = StringField("Name", validators=[InputRequired()])
     submit = SubmitField("Modify view")
