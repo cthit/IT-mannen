@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm  # type: ignore
 from flask_wtf.file import FileField, FileRequired, FileAllowed  # type: ignore
-from wtforms import StringField, BooleanField, SubmitField
+from wtforms import StringField, BooleanField, SubmitField, SelectMultipleField
 from wtforms.fields import DateTimeLocalField
 from wtforms.validators import InputRequired
 
@@ -40,5 +40,5 @@ class create_slideshow_form(FlaskForm):
 
 class edit_slideshow_form(FlaskForm):
     name = StringField("Name", validators=[InputRequired()])
-    post_ids = list[int]("Post IDs")
+    post_ids = SelectMultipleField("Post IDs", coerce=int)
     submit = SubmitField("Modify view")

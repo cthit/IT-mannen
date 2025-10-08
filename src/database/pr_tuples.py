@@ -14,6 +14,13 @@ class TimedPost(NamedTuple):
     start_time: datetime
     end_time: datetime
 
+class FeaturedPost(NamedTuple):
+    id: int
+    description: str
+    file_name: str
+    is_timed: bool
+    start_time: datetime
+    end_time: datetime
 
 class Slideshow(NamedTuple):
     id: int

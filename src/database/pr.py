@@ -124,6 +124,22 @@ def get_groups_posts(cur: cursor, owner_group: str) -> tuple[Post, ...]:
 
 
 @pr_cursor
+def get_all_nonExpired_post(cur: cursor) -> tuple[FeaturedPost, ...]:
+    
+    cur.execute(
+        "SELECT id, description, file_name, owner, start_time, end_time FROM NonExpiredPosts;",
+    )
+    rows: list[tuple[int, str, str, str, datetime, datetime]] = cur.fetchall()
+
+    if not rows:
+        return ()
+
+    posts: tuple[FeaturedPost, ...] = tuple(
+        FeaturedPost(row[0], row[1], row[2], row[3], row[4], row[5]) for row in rows
+    )
+    return posts
+
+@pr_cursor
 def create_slideshow(cur: cursor, name: str) -> int:
     cur.execute(
         "INSERT INTO Slideshows (name, owner) VALUES ( %s, %s) RETURNING id;",
