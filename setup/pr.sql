@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS Slideshows (
     owner TEXT NOT NULL REFERENCES Groups(name) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS PostViewContents (
-    view_id INT NOT NULL REFERENCES Slideshows(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS inSlideshow (
+    slideshow_id INT NOT NULL REFERENCES Slideshows(id) ON DELETE CASCADE,
     post_id INT NOT NULL REFERENCES Posts(id) ON DELETE CASCADE,
-    PRIMARY KEY (view_id, post_id) 
+    PRIMARY KEY (slideshow_id, post_id) 
 );

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <title>IT-mannen</title>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-2xl mx-auto py-10">
+        <h1 class="text-3xl font-bold mb-6">
+            Edit Slideshow: {{ slideshow_name }}
+        </h1>
+        <form method="post" class="bg-white p-6 rounded shadow">
+            <h2 class="text-xl font-semibold mb-4">Posts in this slideshow</h2>
+            <ul>
+            {% for post in posts %}
+                <li class="flex items-center justify-between py-2 border-b">
+                <span>{{ post.description }}</span>
+                </li>
+            {% else %}
+                <li class="text-gray-500">No posts in this slideshow.</li>
+            {% endfor %}
+            </ul>
+            <!-- Add more form fields as needed -->
+            <div class="mt-6 flex justify-end">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html></div></form>

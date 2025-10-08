@@ -38,7 +38,7 @@ class create_slideshow_form(FlaskForm):
     submit = SubmitField("Create view")
 
 
-class modify_slideshow_form(FlaskForm):
-    #route = StringField("Route", validators=[InputRequired()])
+class edit_slideshow_form(FlaskForm):
     name = StringField("Name", validators=[InputRequired()])
+    post_ids = list[int]("Post IDs")
     submit = SubmitField("Modify view")
