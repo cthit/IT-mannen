@@ -195,13 +195,13 @@ def remove_post_from_postview(cur: cursor, view_id: int, post_id: int):
 
 
 @pr_cursor
-def get_content_from_postview(cur: cursor, view_id: int) -> tuple[Post, ...]:
+def get_content_from_slideshow(cur: cursor, slideshow_id: int) -> tuple[Post, ...]:
     cur.execute(
         """SELECT p.id, p.description, p.file_name, tp.id IS NOT NULL AS is_timed 
         FROM Posts p JOIN PostViewContents pvc ON p.id=pvc.post_id
         LEFT JOIN TimedPosts tp ON p.id=tp.id 
         WHERE pvc.view_id=%s;""",
-        (view_id,),
+        (slideshow_id,),
     )
     rows: list[tuple[int, str, str, bool]] = cur.fetchall()
 
