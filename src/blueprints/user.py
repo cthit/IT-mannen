@@ -42,11 +42,6 @@ def user_page() -> str:
         )
     
     return redirect("/")
-   # else:
-   #     flash("post creation failed, form.validate_on_submit() is false", "error")
-   #     #print(form.validate_on_submit())
-    #return redirect("/")
-
 
 def create_blueprint() -> Blueprint:
     return _user

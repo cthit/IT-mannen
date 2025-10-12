@@ -124,21 +124,23 @@ def get_groups_posts(cur: cursor, owner_group: str) -> tuple[Post, ...]:
 
 
 @pr_cursor
-def create_postview(cur: cursor, name: str):
+def create_slideshow(cur: cursor, name: str) -> int:
     cur.execute(
-        "INSERT INTO PostViews (name, owner) VALUES (%s, %s, %s);",
+        "INSERT INTO Slideshows (name, owner) VALUES ( %s, %s) RETURNING id;",
         (name, "admin"),
     )
+    new_id: int = cur.fetchone()[0]
+    return new_id
 
 
 @pr_cursor
-def delete_postview(cur: cursor, postview_id: int):
-    cur.execute("DELETE FROM PostViews WHERE id=%s;", (postview_id,))
+def delete_slideshow(cur: cursor, slideshow_id: int):
+    cur.execute("DELETE FROM Slideshows WHERE id=%s;", (slideshow_id,))
 
 
 @pr_cursor
-def change_postview(
-    cur: cursor, postview_id: int, name: str | None = None
+def change_slideshow(
+    cur: cursor, slideshow_id: int, name: str | None = None
 ):
     fields: list[str] = []
     values: list[int | str] = []
@@ -150,30 +152,30 @@ def change_postview(
     if not fields:
         return
 
-    values.append(postview_id)
-    cur.execute(f"UPDATE PostViews SET {', '.join(fields)} WHERE id=%s;", values)
+    values.append(slideshow_id)
+    cur.execute(f"UPDATE Slideshows SET {', '.join(fields)} WHERE id=%s;", values)
 
 
 @pr_cursor
-def get_postviews(cur:cursor) -> tuple[PostView, ...]:
-    cur.execute("SELECT id, name FROM PostViews")
+def get_slideshows(cur:cursor) -> tuple[Slideshow, ...]:
+    cur.execute("SELECT id, name FROM Slideshows")
     rows: list[tuple[int, str]] = cur.fetchall()
 
-    postviews: tuple[PostView, ...] = tuple(
-        PostView(row[0], row[1]) for row in rows
+    slideshows: tuple[Slideshow, ...] = tuple(
+        Slideshow(row[0], row[1]) for row in rows
     )
-    return postviews
+    return slideshows
 
 
 @pr_cursor
-def get_groups_postviews(cur: cursor, owner_group: str) -> tuple[PostView, ...]:
-    cur.execute("SELECT id name FROM PostViews WHERE owner=%s;", (owner_group,))
+def get_groups_slideshows(cur: cursor, owner_group: str) -> tuple[Slideshow, ...]:
+    cur.execute("SELECT id, name FROM Slideshows WHERE owner=%s;", (owner_group,))
     rows: list[tuple[int, str]] = cur.fetchall()
 
-    postviews: tuple[PostView, ...] = tuple(
-        PostView(row[0], row[1]) for row in rows
+    slideshows: tuple[Slideshow, ...] = tuple(
+        Slideshow(row[0], row[1]) for row in rows
     )
-    return postviews
+    return slideshows
 
 
 @pr_cursor
@@ -193,13 +195,13 @@ def remove_post_from_postview(cur: cursor, view_id: int, post_id: int):
 
 
 @pr_cursor
-def get_content_from_postview(cur: cursor, view_id: int) -> tuple[Post, ...]:
+def get_content_from_slideshow(cur: cursor, slideshow_id: int) -> tuple[Post, ...]:
     cur.execute(
         """SELECT p.id, p.description, p.file_name, tp.id IS NOT NULL AS is_timed 
         FROM Posts p JOIN PostViewContents pvc ON p.id=pvc.post_id
         LEFT JOIN TimedPosts tp ON p.id=tp.id 
         WHERE pvc.view_id=%s;""",
-        (view_id,),
+        (slideshow_id,),
     )
     rows: list[tuple[int, str, str, bool]] = cur.fetchall()
 

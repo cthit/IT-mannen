@@ -15,6 +15,6 @@ class TimedPost(NamedTuple):
     end_time: datetime
 
 
-class PostView(NamedTuple):
+class Slideshow(NamedTuple):
     id: int
     name: str
