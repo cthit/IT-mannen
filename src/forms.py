@@ -39,6 +39,5 @@ class create_slideshow_form(FlaskForm):
 
 
 class edit_slideshow_form(FlaskForm):
-    name = StringField("Name", validators=[InputRequired()])
     post_ids = SelectMultipleField("Post IDs", coerce=int)
     submit = SubmitField("Modify view")
