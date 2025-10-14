@@ -16,27 +16,36 @@
         </h1>
         
             <h2 class="text-xl font-semibold mb-4">Posts in this slideshow</h2>
-            <ul>
-            {% for post in current_posts %}
-                <li class="flex items-center justify-between py-2 border-b">
-                <span>{{ post.description }}</span>
-                </li>
-            {% else %}
-                <li class="text-gray-500">No posts in this slideshow.</li>
-            {% endfor %}
-            </ul>
+            <form method="POST">
+                {{ remove_form.hidden_tag() }}
+                <p>{{ remove_form.post_ids.label}}<br>
+                {{ remove_form.post_ids(class="w-full border rounded p-2", multiple=True)
+                    }}
+                </p>
+                <div class="mt-6 flex justify-end" Remove post button>
+                  {{ remove_form.submit(class="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600", value="Remove selected posts") }}
+                </div>
+            </form> 
 
-                <h2 class="text-xl font-semibold mb-4">Add posts to this slideshow</h2>
-                <form method="POST">
-                    {{ form.hidden_tag() }}
-                    <p>{{ form.post_ids.label}}<br>
-                    {{ form.post_ids(class="w-full border rounded p-2", multiple=True) }}
-                    </p>
+            <h2 class="text-xl font-semibold mb-4">Add posts to this slideshow</h2>
+            <form method="POST">
+                {{ add_form.hidden_tag() }}
+                <p>{{ add_form.post_ids.label}}<br>
+                {{ add_form.post_ids(class="w-full border rounded p-2", multiple=True) }}
+                </p>
 
-            <div class="mt-6 flex justify-end">
-              {{ form.submit(class="px-4 py-2 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600") }}
+            <div class="mt-6 flex justify-end" Add post button>
+              {{ add_form.submit(class="px-4 py-2 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600", value="Add selected posts") }}
             </div>
             </form>
+
+            <div class="mt-6 flex justify-center">
+                <a href="{{ url_for('view.slideshow_stream', slideshow_id=slideshow_id) }}"
+                    class="px-4 py-2 bg-gray-300 text-gray-800 font-medium rounded-lg hover:bg-gray-400 transition">
+                    View Slideshow
+                </a>
+
+            </div>
         </div>
 
         <!-- Flash messages fixed at bottom -->
