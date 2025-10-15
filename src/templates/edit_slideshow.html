@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <title>IT-mannen</title>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-2xl mx-auto py-10">
+        <h1 class="text-3xl font-bold mb-6">
+            Edit Slideshow: {{ slideshow_name }}
+        </h1>
+        
+            <h2 class="text-xl font-semibold mb-4">Posts in this slideshow</h2>
+            <form method="POST">
+                {{ remove_form.hidden_tag() }}
+                <p>{{ remove_form.post_ids.label}}<br>
+                {{ remove_form.post_ids(class="w-full border rounded p-2", multiple=True)
+                    }}
+                </p>
+                <div class="mt-6 flex justify-end" Remove post button>
+                  {{ remove_form.submit(class="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600", value="Remove selected posts") }}
+                </div>
+            </form> 
+
+            <h2 class="text-xl font-semibold mb-4">Add posts to this slideshow</h2>
+            <form method="POST">
+                {{ add_form.hidden_tag() }}
+                <p>{{ add_form.post_ids.label}}<br>
+                {{ add_form.post_ids(class="w-full border rounded p-2", multiple=True) }}
+                </p>
+
+            <div class="mt-6 flex justify-end" Add post button>
+              {{ add_form.submit(class="px-4 py-2 bg-cyan-500 text-white font-semibold rounded-lg hover:bg-cyan-600", value="Add selected posts") }}
+            </div>
+            </form>
+
+            <div class="mt-6 flex justify-center">
+                <a href="{{ url_for('view.slideshow_stream', slideshow_id=slideshow_id) }}"
+                    class="px-4 py-2 bg-gray-300 text-gray-800 font-medium rounded-lg hover:bg-gray-400 transition">
+                    View Slideshow
+                </a>
+
+            </div>
+        </div>
+
+        <!-- Flash messages fixed at bottom -->
+        <div aria-live="polite" class="fixed inset-x-0 bottom-6 flex items-end justify-center pointer-events-none z-50">
+            <div class="w-full max-w-xl px-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="space-y-2">
+                            {% for category, message in messages %}
+                                <div class="pointer-events-auto rounded-lg p-4 shadow-lg transform transition duration-300 ease-out"
+                                         x-data="{ show: true }" x-init="setTimeout(() =&gt; show = false, 5000)" x-show="show"
+                                         :class="{
+                                             'bg-green-50 border-green-200 text-green-800': '{{ category }}' == 'success',
+                                             'bg-red-50 border-red-200 text-red-800': '{{ category }}' == 'error',
+                                             'bg-blue-50 border-blue-200 text-blue-800': '{{ category }}' == 'info'
+                                         }">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-1">
+                                            <p class="text-sm">{{ message }}</p>
+                                        </div>
+                                        <div>
+                                            <button type="button" class="text-gray-500 hover:text-gray-700" @click="show = false">&times;</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+
+</body>
+</html>

@@ -1,11 +1,11 @@
 import time
 
-from database.pr import get_content_from_slideshow
+from database.pr import get_content_from_inSlideshow
 
-def generate(slideshow_id : int, interval : float):
+def generate(slideshow_id: int, interval: float):
 
     while True:
-        for post in get_content_from_slideshow(slideshow_id=slideshow_id):
+        for post in get_content_from_inSlideshow(slideshow_id=slideshow_id):
             with open(f"src/images/{post.file_name}", "rb") as f:
                 img_data = f.read()
             yield (

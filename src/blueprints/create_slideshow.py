@@ -19,7 +19,7 @@ def create_slideshow_view() -> str:
             name=filedata
             )
         flash("Slideshow created successfully!", "success")
-        return redirect(f"/edit_slideshows?slideshow_id={new_id}")
+        return redirect(f"/edit_slideshow/{new_id}")
     else:
         flash("Error in form submission. Please check your inputs.", "error")
         return render_template("create_slideshow.html", form=form)

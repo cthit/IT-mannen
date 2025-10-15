@@ -124,6 +124,22 @@ def get_groups_posts(cur: cursor, owner_group: str) -> tuple[Post, ...]:
 
 
 @pr_cursor
+def get_all_nonExpired_post(cur: cursor) -> tuple[FeaturedPost, ...]:
+    
+    cur.execute(
+        "SELECT id, description, file_name, owner, start_time, end_time FROM NonExpiredPosts;",
+    )
+    rows: list[tuple[int, str, str, str, datetime, datetime]] = cur.fetchall()
+
+    if not rows:
+        return ()
+
+    posts: tuple[FeaturedPost, ...] = tuple(
+        FeaturedPost(row[0], row[1], row[2], row[3], row[4], row[5]) for row in rows
+    )
+    return posts
+
+@pr_cursor
 def create_slideshow(cur: cursor, name: str) -> int:
     cur.execute(
         "INSERT INTO Slideshows (name, owner) VALUES ( %s, %s) RETURNING id;",
@@ -166,6 +182,16 @@ def get_slideshows(cur:cursor) -> tuple[Slideshow, ...]:
     )
     return slideshows
 
+@pr_cursor
+def get_slideshow(cur: cursor, slideshow_id: int) -> Slideshow:
+    cur.execute("SELECT id, name FROM Slideshows WHERE id=%s;", (slideshow_id,))
+    row: tuple[int, str] | None = cur.fetchone()
+
+    if row is None:
+        return None
+
+    slideshow: Slideshow = Slideshow(row[0], row[1])
+    return slideshow
 
 @pr_cursor
 def get_groups_slideshows(cur: cursor, owner_group: str) -> tuple[Slideshow, ...]:
@@ -179,28 +205,30 @@ def get_groups_slideshows(cur: cursor, owner_group: str) -> tuple[Slideshow, ...
 
 
 @pr_cursor
-def add_post_to_postview(cur: cursor, view_id: int, post_id: int):
+def add_post_to_inSlideshow(cur: cursor, slideshow_id: int, post_id: int):
+    #  TODO check if post_id and slideshow_id are valid
     cur.execute(
-        "INSERT INTO PostViewContents (view_id, post_id) VALUES (%s, %s);",
-        (view_id, post_id),
+        "INSERT INTO inSlideshow (slideshow_id, post_id) VALUES (%s, %s);",
+        (slideshow_id, post_id),
     )
 
 
 @pr_cursor
-def remove_post_from_postview(cur: cursor, view_id: int, post_id: int):
+def remove_post_from_inSlideshow(cur: cursor, slideshow_id: int, post_id: int):
+    # TODO check if post_id and slideshow_id are valid
     cur.execute(
-        "DELETE FROM PostViewContents WHERE view_id=%s AND post_id=%s;",
-        (view_id, post_id),
+        "DELETE FROM inSlideshow WHERE slideshow_id=%s AND post_id=%s;",
+        (slideshow_id, post_id),
     )
 
 
 @pr_cursor
-def get_content_from_slideshow(cur: cursor, slideshow_id: int) -> tuple[Post, ...]:
+def get_content_from_inSlideshow(cur: cursor, slideshow_id: int) -> tuple[Post, ...]:
     cur.execute(
         """SELECT p.id, p.description, p.file_name, tp.id IS NOT NULL AS is_timed 
-        FROM Posts p JOIN PostViewContents pvc ON p.id=pvc.post_id
+        FROM Posts p JOIN inSlideshow pvc ON p.id=pvc.post_id
         LEFT JOIN TimedPosts tp ON p.id=tp.id 
-        WHERE pvc.view_id=%s;""",
+        WHERE pvc.slideshow_id=%s;""",
         (slideshow_id,),
     )
     rows: list[tuple[int, str, str, bool]] = cur.fetchall()
