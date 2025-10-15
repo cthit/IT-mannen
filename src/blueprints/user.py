@@ -1,47 +1,58 @@
-
-from flask import Blueprint, render_template, flash, request, redirect, current_app as app
+from flask import (
+    Blueprint,
+    render_template,
+    flash,
+    request,
+    redirect,
+    current_app as app,
+    Response,
+)
+from flask.typing import ResponseReturnValue
 from forms import create_post_form
 from database.pr import create_post, create_timed_post
+from typing import cast
 
 _user = Blueprint("user", __name__, template_folder="templates")
 
 
 @_user.route("/user", methods=["GET", "POST"])
-def user_page() -> str:
-    if request.method == "GET":
-        form = create_post_form()
-        return render_template("user.html", form=form)
-    
+def user_page() -> ResponseReturnValue:
     form = create_post_form()
-    if form.is_timed.data and not form.validate_on_submit():
-        flash("Please fill out all required fields.", "error")
+
+    if request.method == "GET":
         return render_template("user.html", form=form)
-    file_data = form.file.data
-    # Save uploaded file to a new file in the volume if present
-    
-    if file_data:
-        filename = file_data.filename
-        file_data.save(f"/app/src/images/{filename}")
-        if file_data:
-            app.logger.info("File uploaded successfully")
-        else:
-            app.logger.info("No file uploaded")
-    # Use psycopg2-based function to create post
+
+    if request.method == "POST":
+        return _user_page_post(form)
+
+    return redirect("/")
+
+
+def _user_page_post(form: create_post_form) -> ResponseReturnValue:
+    if not form.validate_on_submit():  # type: ignore[reportUnknownMemberType]
+        return render_template("user.html", form=form)
+
     if form.is_timed.data:
-        create_timed_post(
+        post_id = create_timed_post(
             description=form.description.data,
-            file_name=filename,
             start_time=form.start_time.data,
             end_time=form.end_time.data,
         )
-
     else:
-        create_post(
-            description=form.description.data,
-            file_name=filename
-        )
-    
+        post_id = create_post(description=form.description.data)
+
+    file_data = form.file.data
+
+    file_data.save(f"/app/src/images/{post_id}")
+    if file_data:
+        app.logger.info("File uploaded successfully")
+    else:
+        app.logger.info("No file uploaded")
+
     return redirect("/")
+
+    ## TODO check that file has .png extension, file is actually a png and the file is not None
+
 
 def create_blueprint() -> Blueprint:
     return _user
