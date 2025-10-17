@@ -1,0 +1,20 @@
+{% macro render_field(field, attributes=None) %}
+<div>
+    <label>
+        {{ field.label }}
+    </label>
+    {% if attributes %}
+    {{ field(**attributes) }}
+    {% else %}
+    {{ field() }}
+    {% endif %}
+
+    {% if field.errors %}
+    {% for error in field.errors %}
+    <div>
+        {{ error }}
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endmacro %}

@@ -15,7 +15,7 @@ def create_group(cur: cursor, group_name: str):
 def create_post(cur: cursor, description: str) -> int:
 
     cur.execute(
-        "INSERT INTO Posts (description, owner) VALUES (%s, %s);",
+        "INSERT INTO Posts (description, owner) VALUES (%s, %s) RETURNING id;",
         (description, "admin"),
     )
 
