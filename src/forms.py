@@ -27,13 +27,13 @@ class create_post_form(FlaskForm):
     end_time = DateTimeLocalField("End time", format="%Y-%m-%dT%H:%M", validators=[Optional()])
     submit = SubmitField("Create post")
 
-    def validate_file(self, form : FlaskForm, field : FileField):
+    def validate_file(self, field : FileField):
         file = field.data
 
         if not file:
             raise ValidationError("No file uploaded")
         
-        filename = secure_filename(file)
+        filename = secure_filename(file.filename)
         if not filename.lower().endswith(".png"):
             raise ValidationError("File extension must be .png")
         
