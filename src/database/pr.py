@@ -234,9 +234,9 @@ def get_content_from_inSlideshow(cur: cursor, slideshow_id: int) -> tuple[Post, 
         WHERE pvc.slideshow_id=%s;""",
         (slideshow_id,),
     )
-    rows: list[tuple[int, str, str, bool]] = cur.fetchall()
+    rows: list[tuple[int, str, bool]] = cur.fetchall()
 
     posts: tuple[Post, ...] = tuple(
-        Post(row[0], row[1], row[2], row[3]) for row in rows
+        Post(row[0], row[1], row[2]) for row in rows
     )
     return posts
