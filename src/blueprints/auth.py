@@ -141,8 +141,8 @@ def callback():
     # Don't store the full token to save space
     session["authenticated"] = True
     #session["admin"] = is_admin()
-    return essential_user_info
-    #return redirect(url_for("user.user_page"))
+    #return essential_user_info
+    return redirect(url_for("home.index"))
 
 
 def clear_auth_session():

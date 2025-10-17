@@ -12,11 +12,11 @@ def create_group(cur: cursor, group_name: str):
 
 
 @pr_cursor
-def create_post(cur: cursor, description: str) -> int:
+def create_post(cur: cursor, description: str, group:str) -> int:
 
     cur.execute(
         "INSERT INTO Posts (description, owner) VALUES (%s, %s) RETURNING id;",
-        (description, "admin"),
+        (description, group),
     )
 
     post_id: int = cur.fetchone()[0]
@@ -26,12 +26,12 @@ def create_post(cur: cursor, description: str) -> int:
 ## this creates aboth a post and a timed post entry, with the same id
 @pr_cursor
 def create_timed_post(
-    cur: cursor, description: str, start_time: datetime, end_time: datetime
+    cur: cursor, description: str, group:str, start_time: datetime, end_time: datetime
 ) -> int:
 
     cur.execute(
         "INSERT INTO Posts (description, owner) VALUES (%s, %s) RETURNING id;",
-        (description, "admin"),
+        (description, group),
     )
     post_id: int = cur.fetchone()[0]
 
@@ -147,10 +147,10 @@ def get_all_nonExpired_post(cur: cursor) -> tuple[FeaturedPost, ...]:
 
 
 @pr_cursor
-def create_slideshow(cur: cursor, name: str) -> int:
+def create_slideshow(cur: cursor, name: str, group:str) -> int:
     cur.execute(
         "INSERT INTO Slideshows (name, owner) VALUES ( %s, %s) RETURNING id;",
-        (name, "admin"),
+        (name, group),
     )
     new_id: int = cur.fetchone()[0]
     return new_id

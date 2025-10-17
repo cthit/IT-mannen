@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Any, Mapping
 from flask_wtf import FlaskForm  # type: ignore
 from flask_wtf.file import FileField, FileRequired, FileAllowed  # type: ignore
-from wtforms import StringField, BooleanField, SubmitField, SelectMultipleField, ValidationError
+from wtforms import StringField, BooleanField, SubmitField, SelectMultipleField, ValidationError, SelectField
 from wtforms.fields import DateTimeLocalField
 from wtforms.validators import InputRequired, Optional
 from werkzeug.utils import secure_filename
@@ -19,6 +19,7 @@ class modify_button_form(FlaskForm):
 
 class create_post_form(FlaskForm):
     description = StringField("Description", validators=[InputRequired()])
+    group = SelectField("Group", validators=[InputRequired()])
     file = FileField(
         "File", validators=[FileRequired(), FileAllowed(["png"], "png images only!")]
     )

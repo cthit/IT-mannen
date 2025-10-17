@@ -3,6 +3,7 @@ from flask import (
     render_template,
     request,
     redirect,
+    g
 )
 from flask.typing import ResponseReturnValue
 
@@ -17,6 +18,10 @@ _create_post = Blueprint("create_post", __name__, template_folder="templates")
 @login_required
 def create_post_page() -> ResponseReturnValue:
     form = create_post_form()
+    
+    user = g.get("user")
+    groups = [group.get("prettyName","") for group in user.get("groups",[])]
+    form.group.choices = groups
 
     if request.method == "GET":
         return render_template("create_post.html", form=form)
@@ -38,11 +43,12 @@ def _create_post_post(form: create_post_form) -> ResponseReturnValue:
 
         post_id = create_timed_post(
             description=form.description.data,
+            group = str(form.group.data),
             start_time=form.start_time.data,
             end_time=form.end_time.data,
         )
     else:
-        post_id = create_post(description=form.description.data)
+        post_id = create_post(description=form.description.data,group=form.group.data)
 
     file_data = form.file.data
     file_data.save(f"/app/src/images/{post_id}")
