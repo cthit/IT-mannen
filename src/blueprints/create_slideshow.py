@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template, request, flash, redirect
 from forms import create_slideshow_form
 from database.pr import create_slideshow
+from .auth import login_required
 
 _create_slideshow = Blueprint("create_slideshow", __name__, template_folder="templates")
 
 
 @_create_slideshow.route("/create_slideshow", methods=["GET", "POST"])
+@login_required
 def create_slideshow_view() -> str:
     if request.method == "GET":
         form = create_slideshow_form()
