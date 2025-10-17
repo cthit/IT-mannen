@@ -6,6 +6,7 @@ from flask import (
 )
 from flask.typing import ResponseReturnValue
 
+from .auth import login_required
 from forms import create_post_form
 from database.pr import create_post, create_timed_post
 
@@ -13,6 +14,7 @@ _create_post = Blueprint("create_post", __name__, template_folder="templates")
  
 
 @_create_post.route("/create_post", methods=["GET", "POST"])
+@login_required
 def create_post_page() -> ResponseReturnValue:
     form = create_post_form()
 

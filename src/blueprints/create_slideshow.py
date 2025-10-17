@@ -3,6 +3,7 @@ from flask.typing import ResponseReturnValue
 
 from forms import create_slideshow_form
 from database.pr import create_slideshow
+from .auth import login_required
 
 _create_slideshow = Blueprint("create_slideshow", __name__, template_folder="templates")
 
