@@ -2,11 +2,12 @@
 from flask import Blueprint, render_template, flash, request, redirect, current_app as app
 from forms import create_post_form
 from database.pr import create_post, create_timed_post
-
+from .auth import login_required
 _user = Blueprint("user", __name__, template_folder="templates")
 
 
 @_user.route("/user", methods=["GET", "POST"])
+@login_required
 def user_page() -> str:
     if request.method == "GET":
         form = create_post_form()

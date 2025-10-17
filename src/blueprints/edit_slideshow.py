@@ -2,12 +2,13 @@ from flask import Blueprint, render_template, request, redirect, flash
 from database.pr_tuples import Post, Slideshow
 from database.pr import get_content_from_inSlideshow,get_slideshow,add_post_to_inSlideshow, remove_post_from_inSlideshow, get_all_nonExpired_post
 from forms import edit_slideshow_form
-
+from .auth import login_required
 
 _edit_slideshow = Blueprint("edit_slideshow", __name__, template_folder="templates")
 
 
 @_edit_slideshow.route("/edit_slideshow/<int:slideshow_id>", methods=["GET", "POST"])
+@login_required
 def index(slideshow_id: int):
     #create forms
     add_form = edit_slideshow_form()
