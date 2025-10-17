@@ -45,7 +45,7 @@ def _create_post_post(form: create_post_form) -> ResponseReturnValue:
         post_id = create_post(description=form.description.data)
 
     file_data = form.file.data
-    file_data.save(f"/app/src/images/{post_id}")
+    file_data.save(f"/app/src/images/{post_id}.png")
 
     return redirect("/")
 
