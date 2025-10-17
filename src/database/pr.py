@@ -12,20 +12,26 @@ def create_group(cur: cursor, group_name: str):
 
 
 @pr_cursor
-def create_post(cur: cursor, description: str, file_name: str):
+def create_post(cur: cursor, description: str) -> int:
 
     cur.execute(
-        "INSERT INTO Posts (description, file_name, owner) VALUES (%s, %s, %s);",
-        (description, file_name, "admin"),
+        "INSERT INTO Posts (description, owner) VALUES (%s, %s) RETURNING id;",
+        (description, "admin"),
     )
+
+    post_id: int = cur.fetchone()[0]
+    return post_id
+
 
 ## this creates aboth a post and a timed post entry, with the same id
 @pr_cursor
-def create_timed_post(cur: cursor, description: str, file_name: str, start_time: datetime, end_time: datetime) -> int:
+def create_timed_post(
+    cur: cursor, description: str, start_time: datetime, end_time: datetime
+) -> int:
 
     cur.execute(
-        "INSERT INTO Posts (description, file_name, owner) VALUES (%s, %s, %s) RETURNING id;",
-        (description, file_name, "admin"),
+        "INSERT INTO Posts (description, owner) VALUES (%s, %s) RETURNING id;",
+        (description, "admin"),
     )
     post_id: int = cur.fetchone()[0]
 
@@ -35,6 +41,7 @@ def create_timed_post(cur: cursor, description: str, file_name: str, start_time:
     )
 
     return post_id
+
 
 @pr_cursor
 def delete_post(cur: cursor, post_id: int):
@@ -47,6 +54,7 @@ def change_post(cur: cursor, post_id: int, new_description: str):
     cur.execute(
         "UPDATE Posts SET description=%s WHERE id=%s;", (new_description, post_id)
     )
+
 
 ## this only creates a timed post entry, the post must already exist
 @pr_cursor
@@ -109,35 +117,34 @@ def change_timed_post(
 @pr_cursor
 def get_groups_posts(cur: cursor, owner_group: str) -> tuple[Post, ...]:
     cur.execute(
-        """SELECT p.id, p.description, p.file_name, tp.id IS NOT NULL AS is_timed 
+        """SELECT p.id, p.description, tp.id IS NOT NULL AS is_timed 
         FROM Posts p 
         LEFT JOIN TimedPosts tp ON p.id=tp.id 
         WHERE owner=%s;""",
         (owner_group,),
     )
 
-    rows: list[tuple[int, str, str, bool]] = cur.fetchall()
-    posts: tuple[Post, ...] = tuple(
-        Post(row[0], row[1], row[2], row[3]) for row in rows
-    )
+    rows: list[tuple[int, str, bool]] = cur.fetchall()
+    posts: tuple[Post, ...] = tuple(Post(row[0], row[1], row[2]) for row in rows)
     return posts
 
 
 @pr_cursor
 def get_all_nonExpired_post(cur: cursor) -> tuple[FeaturedPost, ...]:
-    
+
     cur.execute(
-        "SELECT id, description, file_name, owner, start_time, end_time FROM NonExpiredPosts;",
+        "SELECT id, description, owner, start_time, end_time FROM NonExpiredPosts;",
     )
-    rows: list[tuple[int, str, str, str, datetime, datetime]] = cur.fetchall()
+    rows: list[tuple[int, str, str, datetime, datetime]] = cur.fetchall()
 
     if not rows:
         return ()
 
     posts: tuple[FeaturedPost, ...] = tuple(
-        FeaturedPost(row[0], row[1], row[2], row[3], row[4], row[5]) for row in rows
+        FeaturedPost(row[0], row[1], row[2], row[3], row[4]) for row in rows
     )
     return posts
+
 
 @pr_cursor
 def create_slideshow(cur: cursor, name: str) -> int:
@@ -155,9 +162,7 @@ def delete_slideshow(cur: cursor, slideshow_id: int):
 
 
 @pr_cursor
-def change_slideshow(
-    cur: cursor, slideshow_id: int, name: str | None = None
-):
+def change_slideshow(cur: cursor, slideshow_id: int, name: str | None = None):
     fields: list[str] = []
     values: list[int | str] = []
 
@@ -173,14 +178,13 @@ def change_slideshow(
 
 
 @pr_cursor
-def get_slideshows(cur:cursor) -> tuple[Slideshow, ...]:
+def get_slideshows(cur: cursor) -> tuple[Slideshow, ...]:
     cur.execute("SELECT id, name FROM Slideshows")
     rows: list[tuple[int, str]] = cur.fetchall()
 
-    slideshows: tuple[Slideshow, ...] = tuple(
-        Slideshow(row[0], row[1]) for row in rows
-    )
+    slideshows: tuple[Slideshow, ...] = tuple(Slideshow(row[0], row[1]) for row in rows)
     return slideshows
+
 
 @pr_cursor
 def get_slideshow(cur: cursor, slideshow_id: int) -> Slideshow:
@@ -193,14 +197,13 @@ def get_slideshow(cur: cursor, slideshow_id: int) -> Slideshow:
     slideshow: Slideshow = Slideshow(row[0], row[1])
     return slideshow
 
+
 @pr_cursor
 def get_groups_slideshows(cur: cursor, owner_group: str) -> tuple[Slideshow, ...]:
     cur.execute("SELECT id, name FROM Slideshows WHERE owner=%s;", (owner_group,))
     rows: list[tuple[int, str]] = cur.fetchall()
 
-    slideshows: tuple[Slideshow, ...] = tuple(
-        Slideshow(row[0], row[1]) for row in rows
-    )
+    slideshows: tuple[Slideshow, ...] = tuple(Slideshow(row[0], row[1]) for row in rows)
     return slideshows
 
 
@@ -225,7 +228,7 @@ def remove_post_from_inSlideshow(cur: cursor, slideshow_id: int, post_id: int):
 @pr_cursor
 def get_content_from_inSlideshow(cur: cursor, slideshow_id: int) -> tuple[Post, ...]:
     cur.execute(
-        """SELECT p.id, p.description, p.file_name, tp.id IS NOT NULL AS is_timed 
+        """SELECT p.id, p.description, tp.id IS NOT NULL AS is_timed 
         FROM Posts p JOIN inSlideshow pvc ON p.id=pvc.post_id
         LEFT JOIN TimedPosts tp ON p.id=tp.id 
         WHERE pvc.slideshow_id=%s;""",

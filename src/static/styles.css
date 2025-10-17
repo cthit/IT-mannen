@@ -2,8 +2,165 @@
     font-family: "ComicMono";
     src: url("ComicMono.ttf");
 }
-  
-body{
-    font-family: "ComicMono";
+
+/* Accent color */
+:root {
+    --accent: #09cdda;
+    --error: #e63946;
+    --text-color: #222;
+    --bg-color: #e6f9fb;
 }
-  
+
+/* General page layout */
+body {
+    font-family: "ComicMono";
+    ;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header,
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: white;
+    border-bottom: 2px solid var(--accent);
+}
+
+footer {
+    border-top: 2px solid var(--accent);
+    font-size: 0.9rem;
+    color: #555;
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+}
+
+/* Headings */
+h1,
+h2 {
+    font-weight: 800;
+    /* makes it bold */
+    color: var(--accent);
+    /* keep your #09cdda color */
+    margin: 0;
+}
+
+header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: white;
+    border-bottom: 4px solid var(--accent);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+header h1 {
+    font-size: 2.5rem;
+    /* make it larger */
+    font-weight: 800;
+    /* extra bold */
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* Form container */
+form {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 450px;
+    width: 100%;
+}
+
+/* Labels */
+form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #333;
+}
+
+/* Inputs, text fields, etc. */
+form input[type="text"],
+form input[type="file"],
+form input[type="datetime-local"],
+form textarea {
+    width: 100%;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+form input:focus,
+form textarea:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(9, 205, 218, 0.25);
+}
+
+/* Checkbox */
+form input[type="checkbox"] {
+    accent-color: var(--accent);
+    transform: scale(1.2);
+    margin-right: 0.5rem;
+}
+
+/* Submit button */
+form input[type="submit"],
+form button[type="submit"] {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+form input[type="submit"]:hover,
+form button[type="submit"]:hover {
+    background-color: #07b8c3;
+}
+
+form input[type="submit"]:active,
+form button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* Error messages */
+form div>div {
+    color: var(--error);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+/* Flash message container */
+.flash-error {
+    color: var(--error);
+    background-color: #ffe6e6;
+    border: 1px solid var(--error);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+/* A bit of polish for field spacing */
+form>div {
+    margin-bottom: 1rem;
+}

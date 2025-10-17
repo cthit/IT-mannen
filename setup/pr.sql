@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS Groups (
 CREATE TABLE IF NOT EXISTS Posts (
     id SERIAL PRIMARY KEY,
     description TEXT NOT NULL,
-    file_name TEXT NOT NULL,
     owner TEXT NOT NULL REFERENCES Groups(name) ON DELETE CASCADE
 );
 
@@ -28,13 +27,13 @@ CREATE TABLE IF NOT EXISTS inSlideshow (
 );
 
 CREATE OR REPLACE VIEW ActivePosts AS
-SELECT posts.id, posts.description, posts.file_name, posts.owner, timedposts.start_time, timedposts.end_time
+SELECT posts.id, posts.description, posts.owner, timedposts.start_time, timedposts.end_time
 FROM posts
 LEFT JOIN timedposts ON posts.id = timedposts.id
 AND NOW() BETWEEN timedposts.start_time AND timedposts.end_time;
 
 CREATE OR REPLACE VIEW NonExpiredPosts AS
-SELECT posts.id, posts.description, posts.file_name, posts.owner, timedposts.start_time,timedposts.end_time
+SELECT posts.id, posts.description, posts.owner, timedposts.start_time,timedposts.end_time
 FROM posts
 LEFT JOIN timedposts ON posts.id = timedposts.id
 AND timedposts.end_time > NOW();
