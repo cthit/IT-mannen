@@ -7,8 +7,8 @@ from flask import (
 from flask.typing import ResponseReturnValue
 
 from .auth import login_required
-from forms import create_post_form
-from database.pr import create_post, create_timed_post
+from src.forms import create_post_form
+from src.database.pr import create_post, create_timed_post
 
 _create_post = Blueprint("create_post", __name__, template_folder="templates")
  
@@ -45,7 +45,7 @@ def _create_post_post(form: create_post_form) -> ResponseReturnValue:
         post_id = create_post(description=form.description.data)
 
     file_data = form.file.data
-    file_data.save(f"/app/src/images/{post_id}")
+    file_data.save(f"/app/src/images/{post_id}.png")
 
     return redirect("/")
 

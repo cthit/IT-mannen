@@ -1,6 +1,6 @@
 from flask import Flask
 import pkgutil
-import blueprints
+from src import blueprints
 import os
 from typing import Sequence
 from authlib.integrations.flask_client import OAuth
@@ -12,7 +12,7 @@ def register_blueprints(app: Flask) -> None:
     modules = pkgutil.iter_modules(path)
 
     for _, module_name, __ in modules:
-        module = __import__(f"blueprints.{module_name}", fromlist=[""])
+        module = __import__(f"src.blueprints.{module_name}", fromlist=[""])
         blueprint = module.create_blueprint()
         app.register_blueprint(blueprint)
 

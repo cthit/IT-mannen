@@ -2,7 +2,13 @@ from collections.abc import Sequence
 from typing import Any, Mapping
 from flask_wtf import FlaskForm  # type: ignore
 from flask_wtf.file import FileField, FileRequired, FileAllowed  # type: ignore
-from wtforms import StringField, BooleanField, SubmitField, SelectMultipleField, ValidationError
+from wtforms import (
+    StringField,
+    BooleanField,
+    SubmitField,
+    SelectMultipleField,
+    ValidationError,
+)
 from wtforms.fields import DateTimeLocalField
 from wtforms.validators import InputRequired, Optional
 from werkzeug.utils import secure_filename
@@ -23,29 +29,33 @@ class create_post_form(FlaskForm):
         "File", validators=[FileRequired(), FileAllowed(["png"], "png images only!")]
     )
     is_timed = BooleanField("Timed post?")
-    start_time = DateTimeLocalField("Start time", format="%Y-%m-%dT%H:%M", validators=[Optional()])
-    end_time = DateTimeLocalField("End time", format="%Y-%m-%dT%H:%M", validators=[Optional()])
+    start_time = DateTimeLocalField(
+        "Start time", format="%Y-%m-%dT%H:%M", validators=[Optional()]
+    )
+    end_time = DateTimeLocalField(
+        "End time", format="%Y-%m-%dT%H:%M", validators=[Optional()]
+    )
     submit = SubmitField("Create post")
 
-    def validate_file(self, form : FlaskForm, field : FileField):
+    def validate_file(self, field: FileField):
         file = field.data
 
         if not file:
             raise ValidationError("No file uploaded")
-        
-        filename = secure_filename(file)
+
+        filename = secure_filename(file.filename)
         if not filename.lower().endswith(".png"):
             raise ValidationError("File extension must be .png")
-        
+
         try:
             image = Image.open(file)
             image.verify()
+            file.seek(0)
 
             if not image.format == "PNG":
                 raise ValidationError("File is not a valid PNG file")
         except:
-                raise ValidationError("File is not a valid PNG file")
-
+            raise ValidationError("File is not a valid PNG file")
 
     def validate(
         self, extra_validators: Mapping[str, Sequence[Any]] | None = None
@@ -61,7 +71,9 @@ class create_post_form(FlaskForm):
             return True
 
         if not start_time:
-            self.start_time.errors.append("Start time is required for timed posts") # errors has static type Sequence but is a list in runtime :(  I promise it works
+            self.start_time.errors.append(
+                "Start time is required for timed posts"
+            )  # errors has static type Sequence but is a list in runtime :(  I promise it works
             return False
 
         if not end_time:

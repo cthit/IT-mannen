@@ -1,0 +1,38 @@
+services:
+  pr_db:
+    image: postgres
+    container_name: pr-postgres-db
+    environment:
+      POSTGRES_USER: ${PR_DB_USER:-admin}
+      POSTGRES_PASSWORD: ${PR_DB_PASSWORD:-pass}
+      POSTGRES_DB: ${PR_DB_NAME:-pr_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  setup:
+    build: .
+    depends_on:
+      - pr_db
+    environment:
+      PR_DB_USER: ${PR_DB_USER:-admin}
+      PR_DB_PASSWORD: ${PR_DB_PASSWORD:-pass}
+      PR_DB_NAME: ${PR_DB_NAME:-pr_db}
+      PR_DB_HOST: pr_db
+      PR_DB_PORT: ${PR_DB_PORT:-5432}
+    command: ["bash", "/app/setup/wait-for-it.sh", "pr_db", "5432", "--", "python", "setup/setup_pr.py"]
+
+  app:
+    build: .
+    depends_on:
+      - setup
+    env_file:
+      - .env
+    ports:
+      - ${FLASK_RUN_PORT:-5000}:3000
+    volumes:
+      - up_images:/app/src/images
+    command: gunicorn src.wsgi:app --workers 3 --bind 0.0.0.0:3000 --timeout 3600000 # don't look at this. Look away!
+
+volumes:
+  up_images:
+  pgdata:
