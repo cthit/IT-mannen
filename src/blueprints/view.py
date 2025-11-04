@@ -1,6 +1,6 @@
 from flask import Response, Blueprint, request
 
-from slidegenerator import generate
+from src.slidegenerator import generate
 
 _view = Blueprint("view", __name__, template_folder="templates")
 

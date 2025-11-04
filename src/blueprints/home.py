@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 
-from database.pr import get_slideshows
+from src.database.pr import get_slideshows
 
 _home = Blueprint("home", __name__, template_folder="templates")
 

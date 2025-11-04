@@ -2,8 +2,8 @@ from psycopg2.extensions import cursor
 from dateutil.parser import parse
 from datetime import datetime
 
-from database.connection_pr import pr_cursor
-from database.pr_tuples import *
+from src.database.connection_pr import pr_cursor
+from src.database.pr_tuples import *
 
 
 @pr_cursor

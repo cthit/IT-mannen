@@ -20,9 +20,8 @@ def devmode_active():
 
 
 # Allow HTTP for local development (required for OAuth2Session)
-# if devmode_active():
-
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+if devmode_active():
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 gamma_root = "https://auth.chalmers.it"
 auth_header = os.getenv("AUTH_HEADER", "")

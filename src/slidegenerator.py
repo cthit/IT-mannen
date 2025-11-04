@@ -1,6 +1,6 @@
 import time
 
-from database.pr import get_content_from_inSlideshow
+from src.database.pr import get_content_from_inSlideshow
 
 
 def generate(slideshow_id: int, interval: float):

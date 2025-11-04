@@ -1,14 +1,15 @@
 from flask import Blueprint, render_template, request, redirect
 from flask.typing import ResponseReturnValue
 
-from forms import create_slideshow_form
-from database.pr import create_slideshow
+from src.forms import create_slideshow_form
+from src.database.pr import create_slideshow
 from .auth import login_required
 
 _create_slideshow = Blueprint("create_slideshow", __name__, template_folder="templates")
 
 
 @_create_slideshow.route("/create_slideshow", methods=["GET", "POST"])
+@login_required
 def create_slideshow_view() -> ResponseReturnValue:
     form = create_slideshow_form()
     if request.method == "GET":
