@@ -45,7 +45,7 @@ services:
       - ${FLASK_RUN_PORT:-5000}:5000
     volumes:
       - up_images:/app/src/images
-    command: python -m gunicorn src.wsgi:app
+    command: python -m src.app
     
 
 volumes:

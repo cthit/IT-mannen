@@ -44,6 +44,7 @@ def create_pr_tables():
     ) as conn:
         sql = read_sql_file(SQL_FILE)
         execute_sql(conn, sql)
+        """
         with conn.cursor() as cursor:
             query = "SELECT name FROM GROUPS WHERE name = 'admin';"
             cursor.execute(query)
@@ -51,6 +52,7 @@ def create_pr_tables():
             if not groups:
                 cursor.execute("INSERT INTO GROUPS (name) VALUES (%s);", ("admin",))
                 conn.commit()
+        """
 
 
 if __name__ == "__main__":
