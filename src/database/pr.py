@@ -7,16 +7,25 @@ from src.database.pr_tuples import *
 
 
 @pr_cursor
-def create_group(cur: cursor, group_name: str):
-    cur.execute("INSERT INTO Groups (name) VALUES (%s);", (group_name,))
+def create_group(cur: cursor, group_id: str):
+    cur.execute("INSERT INTO Actors (id) VALUES (DEFAULT) RETURNING id;")
+    actor_id = cur.fetchone()[0]
+
+    cur.execute("INSERT INTO Groups (actor_id, group_id) VALUES (%s, %s);", (actor_id, group_id,))
+
+@pr_cursor
+def create_user(cur: cursor, user_id: str):
+    cur.execute("INSERT INTO Actors (id) VALUES (DEFAULT) RETURNING id;")
+    actor_id = cur.fetchone()[0]
+
+    cur.execute("INSERT INTO Users (actor_id, user_id) VALUES (%s, %s);", (actor_id, user_id))
 
 
 @pr_cursor
-def create_post(cur: cursor, description: str) -> int:
-
+def create_post(cur: cursor, name : str, description: str, owner : int) -> int:
     cur.execute(
-        "INSERT INTO Posts (description, owner) VALUES (%s, %s) RETURNING id;",
-        (description, "admin"),
+        "INSERT INTO Posts (name, description, owner) VALUES (%s, %s, %s) RETURNING id;",
+        (name, description, owner),
     )
 
     post_id: int = cur.fetchone()[0]
@@ -26,12 +35,12 @@ def create_post(cur: cursor, description: str) -> int:
 ## this creates aboth a post and a timed post entry, with the same id
 @pr_cursor
 def create_timed_post(
-    cur: cursor, description: str, start_time: datetime, end_time: datetime
+    cur: cursor, name : str, description: str, owner : int, start_time: datetime, end_time: datetime
 ) -> int:
 
     cur.execute(
-        "INSERT INTO Posts (description, owner) VALUES (%s, %s) RETURNING id;",
-        (description, "admin"),
+        "INSERT INTO Posts (name, description, owner) VALUES (%s, %s, %s) RETURNING id;",
+        (name, description, owner),
     )
     post_id: int = cur.fetchone()[0]
 
@@ -47,13 +56,15 @@ def create_timed_post(
 def delete_post(cur: cursor, post_id: int):
     cur.execute("DELETE FROM Posts WHERE id=%s;", (post_id,))
 
-
+#TODO: make change affect name too
 @pr_cursor
 def change_post(cur: cursor, post_id: int, new_description: str):
 
     cur.execute(
         "UPDATE Posts SET description=%s WHERE id=%s;", (new_description, post_id)
     )
+
+    
 
 
 ## this only creates a timed post entry, the post must already exist
@@ -69,10 +80,10 @@ def set_timed_post(cur: cursor, post_id: int, start_time: str, end_time: str):
 
 
 @pr_cursor
-def remove_timed_post(cur: cursor, post_id: int):
+def remove_from_timed_posts(cur: cursor, post_id: int):
     cur.execute("DELETE FROM TimedPosts WHERE id=%s;", (post_id,))
 
-
+# TODO fix
 @pr_cursor
 def get_timed_post(cur: cursor, post_id: int) -> TimedPost:
     cur.execute(
@@ -115,13 +126,13 @@ def change_timed_post(
 
 
 @pr_cursor
-def get_groups_posts(cur: cursor, owner_group: str) -> tuple[Post, ...]:
+def get_actors_posts(cur: cursor, actor: int) -> tuple[Post, ...]:
     cur.execute(
         """SELECT p.id, p.description, tp.id IS NOT NULL AS is_timed 
         FROM Posts p 
         LEFT JOIN TimedPosts tp ON p.id=tp.id 
         WHERE owner=%s;""",
-        (owner_group,),
+        (actor,),
     )
 
     rows: list[tuple[int, str, bool]] = cur.fetchall()
@@ -133,24 +144,27 @@ def get_groups_posts(cur: cursor, owner_group: str) -> tuple[Post, ...]:
 def get_all_nonExpired_post(cur: cursor) -> tuple[FeaturedPost, ...]:
 
     cur.execute(
-        "SELECT id, description, owner, start_time, end_time FROM NonExpiredPosts;",
+        "SELECT id, name, description, owner, start_time, end_time FROM NonExpiredPosts;",
     )
-    rows: list[tuple[int, str, str, datetime, datetime]] = cur.fetchall()
+    rows: list[tuple[int, str, str, bool, datetime, datetime]] = cur.fetchall()
 
     if not rows:
         return ()
 
     posts: tuple[FeaturedPost, ...] = tuple(
-        FeaturedPost(row[0], row[1], row[2], row[3], row[4]) for row in rows
+        FeaturedPost(row[0], row[1], row[2], row[3], row[4], row[5]) for row in rows
     )
     return posts
 
 
 @pr_cursor
-def create_slideshow(cur: cursor, name: str) -> int:
+def create_slideshow(cur: cursor, name: str, owner : str, visibility: str) -> int:
+    if visibility not in ('all', 'gamma', 'owner'):
+        raise ValueError(f"visibility must be one of 'all', 'gamma', 'owner', got {visibility!r}")
+    
     cur.execute(
-        "INSERT INTO Slideshows (name, owner) VALUES ( %s, %s) RETURNING id;",
-        (name, "admin"),
+        "INSERT INTO Slideshows (name, owner, visibility) VALUES ( %s, %s, %s) RETURNING id;",
+        (name, owner, visibility),
     )
     new_id: int = cur.fetchone()[0]
     return new_id

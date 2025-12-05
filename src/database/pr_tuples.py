@@ -4,6 +4,7 @@ from datetime import datetime
 
 class Post(NamedTuple):
     id: int
+    name: str
     description: str
     is_timed: bool
 
@@ -16,6 +17,7 @@ class TimedPost(NamedTuple):
 
 class FeaturedPost(NamedTuple):
     id: int
+    name: str
     description: str
     is_timed: bool
     start_time: datetime
