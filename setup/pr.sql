@@ -8,7 +8,7 @@ END$$;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'visibility_type') THEN
-        CREATE TYPE visibility_type AS ENUM ('all', 'gamma', 'specific', 'owner');
+        CREATE TYPE visibility_type AS ENUM ('all', 'gamma', 'owner');
     END IF;
 END$$;
 

@@ -131,6 +131,7 @@ def callback():
 
     essential_user_info = {
         "name": user_info.get("name"),
+        "id": user_info.get("sub"),
         "cid": user_info.get("cid"),
         "groups": active_groups
     }
@@ -140,6 +141,7 @@ def callback():
     # Don't store the full token to save space
     session["authenticated"] = True
     #session["admin"] = is_admin()
+    # TODO Check if user exists in database
     return essential_user_info
     #return redirect(url_for("user.user_page"))
 

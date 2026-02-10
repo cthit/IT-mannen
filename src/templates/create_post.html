@@ -9,7 +9,7 @@
 
   <form method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
-
+    {{ render_field(form.name) }}
     {{ render_field(form.description) }}
     {{ render_field(form.file, {"accept" : ".png"}) }}
     {{ render_field(form.is_timed) }}

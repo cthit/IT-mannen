@@ -27,3 +27,4 @@ class FeaturedPost(NamedTuple):
 class Slideshow(NamedTuple):
     id: int
     name: str
+

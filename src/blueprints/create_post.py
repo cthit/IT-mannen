@@ -3,6 +3,7 @@ from flask import (
     render_template,
     request,
     redirect,
+    g
 )
 from flask.typing import ResponseReturnValue
 
@@ -18,7 +19,13 @@ _create_post = Blueprint("create_post", __name__, template_folder="templates")
 def create_post_page() -> ResponseReturnValue:
     form = create_post_form()
 
+
     if request.method == "GET":
+        '''user = g.get("user")
+        groups = user.get("name")
+        groups2 = [group.get("prettyName","") for group in user.get("groups",[])]
+        owners = groups.append(groups2)
+        form.owner.choices = owners '''
         return render_template("create_post.html", form=form)
 
     if request.method == "POST":
@@ -37,12 +44,20 @@ def _create_post_post(form: create_post_form) -> ResponseReturnValue:
         assert form.end_time.data is not None
 
         post_id = create_timed_post(
+            name = form.name.data,
             description=form.description.data,
+            owner = g.get("user").get("id"),
+            #owner=form.owner.data,
             start_time=form.start_time.data,
             end_time=form.end_time.data,
         )
     else:
-        post_id = create_post(description=form.description.data)
+        post_id = create_post(
+            name = form.name.data,
+            description=form.description.data,
+            owner = g.get("user").get("id"),
+            #owner=form.owner.data
+            )
 
     file_data = form.file.data
     file_data.save(f"/app/src/images/{post_id}.png")

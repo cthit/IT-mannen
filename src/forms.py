@@ -24,6 +24,7 @@ class modify_button_form(FlaskForm):
 
 
 class create_post_form(FlaskForm):
+    name = StringField("Name", validators=[InputRequired()])
     description = StringField("Description", validators=[InputRequired()])
     file = FileField(
         "File", validators=[FileRequired(), FileAllowed(["png"], "png images only!")]
@@ -35,6 +36,7 @@ class create_post_form(FlaskForm):
     end_time = DateTimeLocalField(
         "End time", format="%Y-%m-%dT%H:%M", validators=[Optional()]
     )
+    # owner = SelectField("owner", validators=[InputRequired()])
     submit = SubmitField("Create post")
 
     def validate_file(self, field: FileField):
