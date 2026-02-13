@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% from "form-helper.html" import render_field %}
 
 
 <head>
@@ -22,6 +23,8 @@
         <label class="block text-cyan-700 font-medium mb-1">{{ form.name.label }}</label>
         {{ form.name(class="w-full px-4 py-2 border border-cyan-300 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:outline-none", placeholder="Enter slideshow name") }}
       </div>
+      {{ render_field(form.owner, {"class": "w-full px-4 py-2 border border-cyan-300 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:outline-none"}) }}
+      {{ render_field(form.visibility, {"class": "w-full px-4 py-2 border border-cyan-300 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:outline-none"}) }}
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}

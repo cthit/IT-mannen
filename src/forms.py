@@ -101,6 +101,8 @@ class modify_post_form(FlaskForm):
 
 class create_slideshow_form(FlaskForm):
     name = StringField("Name", validators=[InputRequired()])
+    owner = SelectField("Owner", validators=[InputRequired()])
+    visibility = SelectField("Visibility", validators=[InputRequired()], choices=[("all", "All"), ("gamma", "Gamma"), ("owner", "Owner")])
     submit = SubmitField("Create view")
 
 
