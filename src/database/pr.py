@@ -7,19 +7,20 @@ from src.database.pr_tuples import *
 
 
 @pr_cursor
-def create_group(cur: cursor, group_id: str):
+def create_group(cur: cursor, group_id: str) -> int:
     cur.execute("INSERT INTO Actors (id) VALUES (DEFAULT) RETURNING id;")
     actor_id = cur.fetchone()[0]
 
     cur.execute("INSERT INTO Groups (actor_id, group_id) VALUES (%s, %s);", (actor_id, group_id,))
+    return actor_id
 
 @pr_cursor
-def create_user(cur: cursor, user_id: str):
+def create_user(cur: cursor, user_id: str) -> int:
     cur.execute("INSERT INTO Actors (id) VALUES (DEFAULT) RETURNING id;")
     actor_id = cur.fetchone()[0]
 
     cur.execute("INSERT INTO Users (actor_id, user_id) VALUES (%s, %s);", (actor_id, user_id))
-
+    return actor_id
 
 @pr_cursor
 def create_post(cur: cursor, name : str, description: str, owner : int) -> int:
@@ -254,3 +255,23 @@ def get_content_from_inSlideshow(cur: cursor, slideshow_id: int) -> tuple[Post, 
         Post(row[0], row[1], row[2]) for row in rows
     )
     return posts
+
+@pr_cursor
+def get_actor_id_from_user_id(cur: cursor, user_id: str) -> int | None:
+    cur.execute("SELECT actor_id FROM Users WHERE user_id=%s;", (user_id,))
+    row: tuple[int] | None = cur.fetchone()
+
+    if row is None:
+        return None
+
+    return row[0]
+
+@pr_cursor
+def get_actor_id_from_group_id(cur: cursor, group_id: str) -> int | None:
+    cur.execute("SELECT actor_id FROM Groups WHERE group_id=%s;", (group_id,))
+    row: tuple[int] | None = cur.fetchone()
+
+    if row is None:
+        return None
+
+    return row[0]

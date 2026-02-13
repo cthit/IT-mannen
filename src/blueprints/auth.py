@@ -13,6 +13,8 @@ from functools import wraps
 import os
 import requests
 
+from src.database.pr import create_user, get_actor_id_from_user_id, create_group, get_actor_id_from_group_id
+
 
 
 def devmode_active():
@@ -66,7 +68,7 @@ def login():
 
 @_auth.route("/authorize")
 def authorize():
-    gamma = get_gamma()
+    gamma = get_gamma() 
     return gamma.authorize_redirect(url_for("auth.callback", _external=True))
 
 
@@ -96,15 +98,19 @@ def callback():
         groups_response = r.get(f"{client_api_groups_for}/{id}").json()
 
         # Filter groups to only include committees
-        active_groups = [
-            {
-                "prettyName": group.get("prettyName", {}),
-                "name": group.get("superGroup", {}).get("name"),
-                "post": group.get("post", {}).get("enName"),
-            }
-            for group in groups_response
-            if group.get("superGroup", {}).get("type") != "alumni"
-        ]
+        #create activegroups with prettyName and actor_id for each group that is not an alumni group
+        active_groups = []
+        for group in groups_response:
+            if group.get("superGroup", {}).get("type") != "alumni":
+                 # Get or create actor_id for the group
+                actor_id = get_actor_id_from_group_id(group.get("id"))
+                if actor_id is None:
+                    actor_id = create_group(group.get("id"))
+                active_groups.append({
+                    "prettyName": group.get("prettyName", {}),
+                    "actor_id": actor_id,
+                })
+        
     # {
     #     "id": "ab44f720-8ed9-48b4-ba2a-6fb2a03db8f6",
     #     "name": "digit25",
@@ -129,10 +135,14 @@ def callback():
         print(f"Failed to get api information: {e}")
         active_groups = []
 
+    # Get or create actor_id for the user
+    actor_id = get_actor_id_from_user_id(user_info.get("sub"))
+    if(actor_id is None):
+        actor_id = create_user(user_info.get("sub"))
+        
+
     essential_user_info = {
-        "name": user_info.get("name"),
-        "id": user_info.get("sub"),
-        "cid": user_info.get("cid"),
+        "actor_id": actor_id,
         "groups": active_groups
     }
 
@@ -141,8 +151,8 @@ def callback():
     # Don't store the full token to save space
     session["authenticated"] = True
     #session["admin"] = is_admin()
-    # TODO Check if user exists in database
-    return essential_user_info
+    #return essential_user_info
+    return active_groups  
     #return redirect(url_for("user.user_page"))
 
 

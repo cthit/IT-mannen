@@ -3,7 +3,8 @@ from flask import (
     render_template,
     request,
     redirect,
-    g
+    g,
+    jsonify  # Import jsonify for returning JSON responses
 )
 from flask.typing import ResponseReturnValue
 
@@ -12,7 +13,6 @@ from src.forms import create_post_form
 from src.database.pr import create_post, create_timed_post
 
 _create_post = Blueprint("create_post", __name__, template_folder="templates")
- 
 
 @_create_post.route("/create_post", methods=["GET", "POST"])
 @login_required
@@ -37,8 +37,9 @@ def create_post_page() -> ResponseReturnValue:
 def _create_post_post(form: create_post_form) -> ResponseReturnValue:
     if not form.validate_on_submit():  # type: ignore[reportUnknownMemberType]
         return render_template("create_post.html", form=form)
-    
-    assert form.description.data is not None
+
+    if form.description.data is None:
+        return render_template("create_post.html", form=form, error="Description is required"), 400
     if form.is_timed.data:
         assert form.start_time.data is not None
         assert form.end_time.data is not None
@@ -46,8 +47,7 @@ def _create_post_post(form: create_post_form) -> ResponseReturnValue:
         post_id = create_timed_post(
             name = form.name.data,
             description=form.description.data,
-            owner = g.get("user").get("id"),
-            #owner=form.owner.data,
+            owner = g.get("user")["actor_id"], 
             start_time=form.start_time.data,
             end_time=form.end_time.data,
         )
@@ -55,9 +55,8 @@ def _create_post_post(form: create_post_form) -> ResponseReturnValue:
         post_id = create_post(
             name = form.name.data,
             description=form.description.data,
-            owner = g.get("user").get("id"),
-            #owner=form.owner.data
-            )
+            owner = g.get("user")["actor_id"], 
+        )
 
     file_data = form.file.data
     file_data.save(f"/app/src/images/{post_id}.png")

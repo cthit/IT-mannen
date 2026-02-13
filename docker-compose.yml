@@ -10,7 +10,7 @@ services:
     #   - .env
 
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
   setup:
     build: .
     depends_on:
