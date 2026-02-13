@@ -139,9 +139,11 @@ def callback():
     actor_id = get_actor_id_from_user_id(user_info.get("sub"))
     if(actor_id is None):
         actor_id = create_user(user_info.get("sub"))
-        
+    
+    nick = user_info.get("nickname")
 
-    essential_user_info = {
+    essential_user_info = { 
+        "nick": nick,
         "actor_id": actor_id,
         "groups": active_groups
     }
@@ -151,8 +153,8 @@ def callback():
     # Don't store the full token to save space
     session["authenticated"] = True
     #session["admin"] = is_admin()
-    #return essential_user_info
-    return active_groups  
+    return nick 
+    #return redirect(url_for("home.index")) 
     #return redirect(url_for("user.user_page"))
 
 

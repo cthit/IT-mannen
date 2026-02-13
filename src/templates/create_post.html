@@ -11,6 +11,7 @@
     {{ form.hidden_tag() }}
     {{ render_field(form.name) }}
     {{ render_field(form.description) }}
+    {{ render_field(form.owner) }}
     {{ render_field(form.file, {"accept" : ".png"}) }}
     {{ render_field(form.is_timed) }}
     {{ render_field(form.start_time) }}

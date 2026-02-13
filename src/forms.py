@@ -8,6 +8,7 @@ from wtforms import (
     SubmitField,
     SelectMultipleField,
     ValidationError,
+    SelectField
 )
 from wtforms.fields import DateTimeLocalField
 from wtforms.validators import InputRequired, Optional
@@ -29,6 +30,7 @@ class create_post_form(FlaskForm):
     file = FileField(
         "File", validators=[FileRequired(), FileAllowed(["png"], "png images only!")]
     )
+    owner = SelectField("Owner", validators=[InputRequired()])
     is_timed = BooleanField("Timed post?")
     start_time = DateTimeLocalField(
         "Start time", format="%Y-%m-%dT%H:%M", validators=[Optional()]
