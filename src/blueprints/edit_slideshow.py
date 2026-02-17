@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, flash
 from src.database.pr_tuples import Post, Slideshow
-from src.database.pr import get_content_from_inSlideshow,get_slideshow,add_post_to_inSlideshow, remove_post_from_inSlideshow, get_all_nonExpired_post
+from src.database.pr import get_content_from_SlideshowContents,get_slideshow,add_post_to_SlideshowContents, remove_post_from_SlideshowContents, get_all_nonExpired_post
 from src.forms import edit_slideshow_form
 from .auth import login_required
 
@@ -18,7 +18,7 @@ def index(slideshow_id: int):
     slideshow_name = slideshow.name
 
     nonExpired_posts = get_all_nonExpired_post()
-    current_posts = get_content_from_inSlideshow(slideshow_id)
+    current_posts = get_content_from_SlideshowContents(slideshow_id)
     current_posts_ids = [post.id for post in current_posts]
 
     # Update choices for the SelectMultipleField to exclude already added posts
@@ -35,7 +35,7 @@ def index(slideshow_id: int):
         # Add and remove posts accordingly
         for post_id in new_posts:
             if post_id not in current_posts_ids:
-                add_post_to_inSlideshow(slideshow_id, post_id)
+                add_post_to_SlideshowContents(slideshow_id, post_id)
         
         return redirect(request.url)
 
@@ -44,8 +44,7 @@ def index(slideshow_id: int):
 
         for post_id in removed_posts:
             if post_id in current_posts_ids:
-                remove_post_from_inSlideshow(slideshow_id, post_id)
-
+                remove_post_from_SlideshowContents(slideshow_id, post_id)
         return redirect(request.url)
 
 
