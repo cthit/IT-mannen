@@ -275,3 +275,40 @@ def get_actor_id_from_group_id(cur: cursor, group_id: str) -> int | None:
         return None
 
     return row[0]
+
+@pr_cursor
+def get_slideshow_owner(cur: cursor, slideshow_id: int) -> int | None:
+    cur.execute("SELECT owner FROM Slideshows WHERE id=%s;", (slideshow_id,))
+    row: tuple[int] | None = cur.fetchone()
+
+    if row is None:
+        return None
+
+    return row[0]
+
+@pr_cursor
+def get_all_owned_posts(cur: cursor, actor_ids: list[int]) -> tuple[Post, ...]:
+    cur.execute(
+        """SELECT p.id
+        FROM Posts p
+        WHERE p.owner = ANY(%s);""",
+        (actor_ids,)
+    )
+
+    rows: list[tuple[int, str, bool]] = cur.fetchall()
+    posts: tuple[Post, ...] = tuple(Post(row[0], row[1], row[2]) for row in rows)
+    return posts
+
+@pr_cursor
+def get_all_owned_non_expired_posts(cur: cursor, actor_ids: list[int]) -> tuple[Post, ...]:
+    cur.execute(
+        """SELECT p.id
+        FROM NonExpiredPosts p 
+        WHERE p.owner = ANY(%s);""",
+        (actor_ids,)
+    )
+
+    rows: list[tuple[int, str, bool]] = cur.fetchall()
+    posts: tuple[Post, ...] = tuple(Post(row[0], row[1], row[2]) for row in rows)
+    return posts
+

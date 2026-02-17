@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, flash
+from flask import Blueprint, render_template, request, redirect, flash, g
 from src.database.pr_tuples import Post, Slideshow
-from src.database.pr import get_content_from_SlideshowContents,get_slideshow,add_post_to_SlideshowContents, remove_post_from_SlideshowContents, get_all_nonExpired_post
+from src.database.pr import get_content_from_SlideshowContents,get_slideshow,add_post_to_SlideshowContents, remove_post_from_SlideshowContents, get_all_owned_non_expired_posts, get_slideshow_owner
 from src.forms import edit_slideshow_form
 from .auth import login_required
 
@@ -11,18 +11,38 @@ _edit_slideshow = Blueprint("edit_slideshow", __name__, template_folder="templat
 @login_required
 def index(slideshow_id: int):
     #create forms
+    owner = False
+     # Start with the actor_id from user
+    actor_id = g.get("user")["actor_id"]
+    groups = g.get("user")["groups"]
+
+    actor_ids = [actor_id]  # Start with the actor_id from user
+
+    for group in groups:
+        actor_ids.append(group.get("actor_id")) 
+        
+    for actor_id in actor_ids:
+        if actor_id == get_slideshow_owner(slideshow_id):
+            owner = True
+            break
+
+    if not owner:
+        flash("You do not have permission to edit this slideshow.")
+        return redirect("/")
+
+
     add_form = edit_slideshow_form()
     remove_form = edit_slideshow_form()
 
     slideshow = get_slideshow(slideshow_id)
     slideshow_name = slideshow.name
 
-    nonExpired_posts = get_all_nonExpired_post()
+    nonExpired_posts = get_all_owned_non_expired_posts(actor_ids=actor_ids)
     current_posts = get_content_from_SlideshowContents(slideshow_id)
     current_posts_ids = [post.id for post in current_posts]
 
     # Update choices for the SelectMultipleField to exclude already added posts
-    newchoices = [(post.id, post.description) for post in nonExpired_posts if post.id not in current_posts_ids]
+    newchoices = [(post.id, post.description) for post in nonExpired_a = [posts if post.id not in current_posts_ids]
     add_form.post_ids.choices = newchoices
 
     # Choices for removing posts are the currently added posts
