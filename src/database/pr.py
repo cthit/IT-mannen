@@ -223,28 +223,28 @@ def get_groups_slideshows(cur: cursor, owner_group: str) -> tuple[Slideshow, ...
 
 
 @pr_cursor
-def add_post_to_inSlideshow(cur: cursor, slideshow_id: int, post_id: int):
+def add_post_to_SlideshowContents(cur: cursor, slideshow_id: int, post_id: int):
     #  TODO check if post_id and slideshow_id are valid
     cur.execute(
-        "INSERT INTO inSlideshow (slideshow_id, post_id) VALUES (%s, %s);",
+        "INSERT INTO SlideshowContents (slideshow_id, post_id) VALUES (%s, %s);",
         (slideshow_id, post_id),
     )
 
 
 @pr_cursor
-def remove_post_from_inSlideshow(cur: cursor, slideshow_id: int, post_id: int):
+def remove_post_from_SlideshowContents(cur: cursor, slideshow_id: int, post_id: int):
     # TODO check if post_id and slideshow_id are valid
     cur.execute(
-        "DELETE FROM inSlideshow WHERE slideshow_id=%s AND post_id=%s;",
+        "DELETE FROM SlideshowContents WHERE slideshow_id=%s AND post_id=%s;",
         (slideshow_id, post_id),
     )
 
 
 @pr_cursor
-def get_content_from_inSlideshow(cur: cursor, slideshow_id: int) -> tuple[Post, ...]:
+def get_content_from_SlideshowContents(cur: cursor, slideshow_id: int) -> tuple[Post, ...]:
     cur.execute(
         """SELECT p.id, p.description, tp.id IS NOT NULL AS is_timed 
-        FROM Posts p JOIN inSlideshow pvc ON p.id=pvc.post_id
+        FROM Posts p JOIN SlideshowContents pvc ON p.id=pvc.post_id
         LEFT JOIN TimedPosts tp ON p.id=tp.id 
         WHERE pvc.slideshow_id=%s;""",
         (slideshow_id,),

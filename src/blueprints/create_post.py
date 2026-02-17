@@ -95,6 +95,7 @@ _create_post = Blueprint("create_post", __name__, template_folder="templates")
 def create_post_page() -> ResponseReturnValue:
     form = create_post_form()
 
+    # get all possible owners (user and groups) for the select field
     user = g.get("user")["nick"]
     groups = [group.get("prettyName") for group in g.get("user")["groups"]]
     owners = [user] + groups
